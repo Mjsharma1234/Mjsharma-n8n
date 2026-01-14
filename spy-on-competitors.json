@@ -1,0 +1,680 @@
+{
+    "name": "Spy on Competitors",
+    "nodes": [
+        {
+            "parameters": {
+                "documentId": {
+                    "__rl": true,
+                    "value": "1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co",
+                    "mode": "list",
+                    "cachedResultName": "Competitor Research",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co\/edit?usp=drivesdk"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": "gid=0",
+                    "mode": "list",
+                    "cachedResultName": "Competitor details",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co\/edit#gid=0"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 4.5999999999999996447286321199499070644378662109375,
+            "position": [
+                -160,
+                -240
+            ],
+            "id": "f280766d-9588-4459-a74e-0b699b8cd7a2",
+            "name": "Get row(s) in sheet",
+            "credentials": {
+                "googleSheetsOAuth2Api": {
+                    "id": "3BdL7kR2MCNu2ABP",
+                    "name": "Google Sheets account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                16,
+                -240
+            ],
+            "id": "c63840a1-655c-4987-8235-655d74293e29",
+            "name": "Loop Over Items"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=Company name: {{ $json['Company name'] }}\nCompany domain: {{ $json['Company domain'] }}",
+                "hasOutputParser": true,
+                "options": {
+                    "systemMessage": "=##Role\nYou are a part fo a competitor research system that is looking for useful signals on competitors\n\nYou will be provided with company information including:\n\nDomain\n\nYour task is to research and extract the following key business metrics for this company:\nRequired Data Points:\n- Content Output\n- Ad Activity\n- Product Launches\n- Partnerships \/ Integrations Added\n- Press Mentions \/ PR Events\n- Technology Stack Changes\n- Company's LinkedIn profile Url\n\nUse the Explorium tools to:\n1. First use match-business to find the business ID\n2. Then use their list of business enrichment tools to get the company details\n\nUse the tavilySearch tool to:\n- To get the company's LinkedIn profile URL.\n- Make sure you get the correct url\n\nExecute a search query using Tavily Search:\n{\n  \"query\": \"Company's name Linkedin profile url\",\n  \"auto_parameters\": false,\n  \"max_results\": 3,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_domains\": [\"linkedin.com\"]\n}\n\nREMEMBER:\nUse the TavilySearch tool at the end, after retrieving all the data from Explorium.\n\nReturn the Output in this exact JSON Structure:\n{\n  \"contentOutput\": \"example\",\n  \"adActivity\": \"example\",\n  \"productLaunches\": \"example\",\n  \"partnershipsIntegrationsAdded\": \"example\",\n  \"pressMentionsPREvents\": \"example\",\n  \"technologyStackChanges\": \"example\",\n  \"linkedin\": \"url\"\n}\n\nYou will be responsible for getting recent signals so always look for data that is from one max one week ago tody (todays date: {{ $now }})"
+                }
+            },
+            "type": "@n8n\/n8n-nodes-langchain.agent",
+            "typeVersion": 2.100000000000000088817841970012523233890533447265625,
+            "position": [
+                416,
+                -224
+            ],
+            "id": "11bd8f54-fea3-43c0-a4cb-87964714c650",
+            "name": "AI Agent",
+            "retryOnFail": true
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "gpt-4.1-mini"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                256,
+                -32
+            ],
+            "id": "e5dd5ca4-f2c3-43c1-8182-b6b2b0fa8c67",
+            "name": "OpenAI Chat Model",
+            "credentials": {
+                "openAiApi": {
+                    "id": "VXreWhWkli4Eq3Hf",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"contentOutput\": \"example\",\n  \"adActivity\": \"example\",\n  \"productLaunches\": \"example\",\n  \"partnershipsIntegrationsAdded\": \"example\",\n  \"pressMentionsPREvents\": \"example\",\n  \"technologyStackChanges\": \"example\",\n  \"linkedin\": \"url\"\n}",
+                "autoFix": true
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.3000000000000000444089209850062616169452667236328125,
+            "position": [
+                640,
+                -32
+            ],
+            "id": "cd13638c-fbf2-4219-bf3a-53b3b33fde60",
+            "name": "Structured Output Parser"
+        },
+        {
+            "parameters": {
+                "documentId": {
+                    "__rl": true,
+                    "value": "1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co",
+                    "mode": "list",
+                    "cachedResultName": "Competitor Research",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co\/edit?usp=drivesdk"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": 910184630,
+                    "mode": "list",
+                    "cachedResultName": "My company",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co\/edit#gid=910184630"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 4.5999999999999996447286321199499070644378662109375,
+            "position": [
+                896,
+                0
+            ],
+            "id": "94cd152e-dc2e-4a2e-9e63-88d5f6c9b8df",
+            "name": "Get row(s) in sheet1",
+            "credentials": {
+                "googleSheetsOAuth2Api": {
+                    "id": "3BdL7kR2MCNu2ABP",
+                    "name": "Google Sheets account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=Competitor data: \nContent: {{ $('AI Agent').item.json.output.contentOutput }}\nAd activity: {{ $('AI Agent').item.json.output.adActivity }}\nProduct Launches: {{ $('AI Agent').item.json.output.productLaunches }}\nPartenrship intergrations: {{ $('AI Agent').item.json.output.partnershipsIntegrationsAdded }}\nPress mentions:\n{{ $('AI Agent').item.json.output.pressMentionsPREvents }}\nTech stack: {{ $('AI Agent').item.json.output.technologyStackChanges }}\nLinkedin Followers: {{ $('Linkedin Followers + Employee count').item.json.follower_count }}\nEmployees: {{ $('Linkedin Followers + Employee count').item.json.company_size[1] }}\nWebsite vists: {{ $('Website visits').item.json.website_traffic_history[4].organic }}\n\n\nMy data: {{ JSON.stringify($json.data[0]) }}",
+                "options": {
+                    "systemMessage": "=##Role\nYou are a part for a competitor research system that is looking for useful signals on competitors\n\n##Task\nYou will be given data on my competitors as well as the same data points but for my company. Your job is to go through the data points that can compare my competitor to my company and then generate key insights. Your insight should be a short paragraph, around 200 words long. "
+                }
+            },
+            "type": "@n8n\/n8n-nodes-langchain.agent",
+            "typeVersion": 2.100000000000000088817841970012523233890533447265625,
+            "position": [
+                256,
+                128
+            ],
+            "id": "8b91b184-8b30-46cf-843e-d1c8b01ecb21",
+            "name": "Insights"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                1056,
+                0
+            ],
+            "id": "1158f172-145f-4f45-a0cb-bd89fc16f1be",
+            "name": "Aggregate"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "cdf526f5-f4b5-44bf-af29-ff6b369c42fa",
+                            "name": "Company name",
+                            "value": "={{ $json['Company name'] }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "b4dcff77-7587-42f6-bab8-67549995f062",
+                            "name": "Company domain",
+                            "value": "={{ $json['Company domain'] }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.399999999999999911182158029987476766109466552734375,
+            "position": [
+                224,
+                -224
+            ],
+            "id": "0e3626c5-c0be-409a-bab1-6b8cc1f8e6ed",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "documentId": {
+                    "__rl": true,
+                    "value": "1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co",
+                    "mode": "list",
+                    "cachedResultName": "Competitor Research",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1SvDd-nZ9RwnXMZzSU0RwYRTFxnXcSwnClQ5kWyBx3Co\/edit?usp=drivesdk"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": 926439229,
+                    "mode": "list",
+                    "cachedResultName": "Competitor analysis",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1iXuRPIESqfdKfLkABf-HfzWxLQ2lfo0Qsl2iMGGwB1c\/edit#gid=926439229"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "Company": "={{ $('Edit Fields').item.json['Company name'] }}",
+                        "Website Traffic Growth": "={{ $('Website visits').item.json.website_traffic_history[4].organic }}",
+                        "Insights": "={{ $json.output }}",
+                        "Technology Stack Changes": "={{ $('AI Agent').item.json.output.technologyStackChanges }}",
+                        "Press Mentions PREvents": "={{ $('AI Agent').item.json.output.pressMentionsPREvents }}",
+                        "Employee Count": "={{ $('Linkedin Followers + Employee count').item.json.company_size[1] }}",
+                        "LinkedIn Followers": "={{ $('Linkedin Followers + Employee count').item.json.follower_count }}",
+                        "Partnerships Integrations Added": "={{ $('AI Agent').item.json.output.partnershipsIntegrationsAdded }}",
+                        "Product Launch Frequency": "={{ $('AI Agent').item.json.output.productLaunches }}",
+                        "Ad Activity": "={{ $('AI Agent').item.json.output.adActivity }}",
+                        "Content Output": "={{ $('AI Agent').item.json.output.contentOutput }}"
+                    },
+                    "matchingColumns": [],
+                    "schema": [
+                        {
+                            "id": "Company",
+                            "displayName": "Company",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Website Traffic Growth",
+                            "displayName": "Website Traffic Growth",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Content Output",
+                            "displayName": "Content Output",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Ad Activity",
+                            "displayName": "Ad Activity",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Product Launch Frequency",
+                            "displayName": "Product Launch Frequency",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Partnerships Integrations Added",
+                            "displayName": "Partnerships Integrations Added",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "LinkedIn Followers",
+                            "displayName": "LinkedIn Followers",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Employee Count",
+                            "displayName": "Employee Count",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Press Mentions PREvents",
+                            "displayName": "Press Mentions PREvents",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Technology Stack Changes",
+                            "displayName": "Technology Stack Changes",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        },
+                        {
+                            "id": "Insights",
+                            "displayName": "Insights",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 4.5999999999999996447286321199499070644378662109375,
+            "position": [
+                544,
+                128
+            ],
+            "id": "96563ec5-7556-4249-8978-1ffb2288a622",
+            "name": "Append row in sheet",
+            "credentials": {
+                "googleSheetsOAuth2Api": {
+                    "id": "3BdL7kR2MCNu2ABP",
+                    "name": "Google Sheets account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        []
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                -336,
+                -240
+            ],
+            "id": "8a4fc11f-61bc-4a06-acab-46615899772c",
+            "name": "Schedule Trigger"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.apify.com\/v2\/acts\/AgfKk0sQQxkpQJ1Dt\/run-sync-get-dataset-items",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Accept",
+                            "value": "application\/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer <token>"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n    \"startUrls\": [\n        {\n            \"url\": \"{{ $('AI Agent').item.json.output.linkedin }}\",\n            \"id\": \"1\"\n        }\n    ]\n}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                816,
+                -224
+            ],
+            "id": "0718ca78-c94f-4613-810b-e8876f240e14",
+            "name": "Linkedin Followers + Employee count"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.apify.com\/v2\/acts\/TMVSmdgr57tzAHwYv\/run-sync-get-dataset-items",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Accept",
+                            "value": "application\/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer <token>"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n    \"include_backlinks\": false,\n    \"include_broken_links\": false,\n    \"include_competitors\": false,\n    \"include_keywords\": false,\n    \"include_keywords_difficulty\": false,\n    \"include_keywords_ranking\": false,\n    \"include_serp\": false,\n    \"include_top_websites\": false,\n    \"include_traffic\": true,\n    \"include_web_authority\": false,\n    \"url\": \"{{ $('Edit Fields').item.json['Company domain'] }}\"\n}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                976,
+                -224
+            ],
+            "id": "73045dd9-0f9c-45ff-b9ad-a18b71772b4f",
+            "name": "Website visits"
+        },
+        {
+            "parameters": {
+                "sseEndpoint": "https:\/\/mcp.explorium.ai\/sse",
+                "authentication": "bearerAuth",
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.mcpClientTool",
+            "typeVersion": 1,
+            "position": [
+                400,
+                -32
+            ],
+            "id": "feed2e61-e1ea-4e8c-9a58-29c8b76acca4",
+            "name": "Explorium",
+            "credentials": {
+                "httpBearerAuth": {
+                    "id": "qkMiEk1D2wZUhlAu",
+                    "name": "Explorium"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "toolDescription": "Use this tool to search and get the LinkedIn profile url",
+                "method": "POST",
+                "url": "https:\/\/api.tavily.com\/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer <token>"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ \/*n8n-auto-generated-fromAI-override*\/ $fromAI('JSON', ``, 'json') }}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequestTool",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                528,
+                -32
+            ],
+            "id": "0f86ec02-6cb7-4df5-8ddf-ef5172bbc363",
+            "name": "tavilySearch"
+        }
+    ],
+    "pinData": [],
+    "connections": {
+        "Get row(s) in sheet": {
+            "main": [
+                [
+                    {
+                        "node": "Loop Over Items",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop Over Items": {
+            "main": [
+                [],
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    },
+                    {
+                        "node": "Insights",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    },
+                    {
+                        "node": "Structured Output Parser",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Linkedin Followers + Employee count",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get row(s) in sheet1": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Insights": {
+            "main": [
+                [
+                    {
+                        "node": "Append row in sheet",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "Insights",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Append row in sheet": {
+            "main": [
+                [
+                    {
+                        "node": "Loop Over Items",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Get row(s) in sheet",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Linkedin Followers + Employee count": {
+            "main": [
+                [
+                    {
+                        "node": "Website visits",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Website visits": {
+            "main": [
+                [
+                    {
+                        "node": "Get row(s) in sheet1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Explorium": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "tavilySearch": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "cc523ee2-cac6-4bf5-9322-3c172b95810c",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "da03a5552ab09c1de1ede387a5627c0f9ea43d6e5b998a1b99329e646acc0b35"
+    },
+    "id": "qC2jz4nxW14dFCeT",
+    "tags": [
+        {
+            "updatedAt": "2025-10-21T06:49:01.940Z",
+            "createdAt": "2025-10-21T06:49:01.940Z",
+            "id": "mOHgFJnTitpDhXu8",
+            "name": "Template"
+        }
+    ]
+}

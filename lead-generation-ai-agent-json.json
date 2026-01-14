@@ -1,0 +1,849 @@
+{
+    "name": "Lead Generation AI Agent",
+    "nodes": [
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "20335efb-c8c3-430b-99ec-3d21f97d9fa5",
+                            "leftValue": "={{ $json.email }}",
+                            "rightValue": "[null]",
+                            "operator": {
+                                "type": "string",
+                                "operation": "notEmpty",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                2384,
+                576
+            ],
+            "id": "2d7ff905-f9b0-4530-9a6a-e6c37a7497a1",
+            "name": "Filter"
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "documentId": {
+                    "__rl": true,
+                    "value": "1Cvza9JPnj70jbEICLAunJFrxrtKiGE0Oo6MCZ4aZKU0",
+                    "mode": "list",
+                    "cachedResultName": "LeadScrape",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1Cvza9JPnj70jbEICLAunJFrxrtKiGE0Oo6MCZ4aZKU0\/edit?usp=drivesdk"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": 572712501,
+                    "mode": "list",
+                    "cachedResultName": "Copy of Sheet1",
+                    "cachedResultUrl": "https:\/\/docs.google.com\/spreadsheets\/d\/1Cvza9JPnj70jbEICLAunJFrxrtKiGE0Oo6MCZ4aZKU0\/edit#gid=572712501"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "personName": "={{ $json.personName }}",
+                        "title": "={{ $json.title }}",
+                        "email": "={{ $json.email }}",
+                        "linkedIn": "={{ $json.linkedIn }}",
+                        "person_location": "={{ $json.person_location }}",
+                        "organization_website": "={{ $json.organization_website }}"
+                    },
+                    "matchingColumns": [],
+                    "schema": [
+                        {
+                            "id": "personName",
+                            "displayName": "personName",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "title",
+                            "displayName": "title",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "email",
+                            "displayName": "email",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "linkedIn",
+                            "displayName": "linkedIn",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "person_location",
+                            "displayName": "person_location",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "organization_website",
+                            "displayName": "organization_website",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "canBeUsedToMatch": true,
+                            "removed": false
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 4.5,
+            "position": [
+                2768,
+                576
+            ],
+            "id": "265e6ec2-a58e-4721-b797-24bfa2a1ec69",
+            "name": "Google Sheets",
+            "credentials": {
+                "googleSheetsOAuth2Api": {
+                    "id": "hRK22fEqvm3omtsD",
+                    "name": "Google Sheets account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "compare": "selectedFields",
+                "fieldsToCompare": "email",
+                "options": []
+            },
+            "type": "n8n-nodes-base.removeDuplicates",
+            "typeVersion": 2,
+            "position": [
+                2576,
+                576
+            ],
+            "id": "33fe208c-9c6a-4afb-9411-d536f09c752b",
+            "name": "Remove Duplicates"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "gpt-4.1-mini"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                352,
+                720
+            ],
+            "id": "d24008c0-3364-4b5d-9a55-d8ef6e072129",
+            "name": "OpenAI Chat Model",
+            "credentials": {
+                "openAiApi": {
+                    "id": "bfZD7tWaxPGpOAH8",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "amount": 2,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                816,
+                560
+            ],
+            "id": "ec530f94-9de0-4fe9-8f02-3c5e5044d570",
+            "name": "Wait",
+            "webhookId": "49d5f9f2-5f0b-4287-82c4-fd4a8f52281a"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "73f1c3f6-d15e-4f71-9dc6-5a2d243779a3",
+                                        "leftValue": "={{ $json.data.status }}",
+                                        "rightValue": "FAILED",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "renameOutput": true,
+                            "outputKey": "failed"
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "e3acfebb-9e55-4a04-a5f3-e0d4b0e2500d",
+                                        "leftValue": "={{ $json.data.status }}",
+                                        "rightValue": "SUCCEEDED",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "renameOutput": true,
+                            "outputKey": "success"
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.data.status }}",
+                                        "rightValue": "RUNNING",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "a5c1f4b3-5459-4e98-b263-6e9d991546c2"
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "renameOutput": true,
+                            "outputKey": "running"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.29999999999999982236431605997495353221893310546875,
+            "position": [
+                1184,
+                544
+            ],
+            "id": "fb68701f-0e19-4690-bdf3-3dcf9639a2de",
+            "name": "Switch"
+        },
+        {
+            "parameters": {
+                "amount": 3,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                1408,
+                720
+            ],
+            "id": "54529b5b-a8b1-4776-94d2-81887e853a94",
+            "name": "Wait1",
+            "webhookId": "5af5d2f0-d346-4abd-a3e9-52f561a8a485"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.apify.com\/v2\/acts\/GlxYrQp6f3YAzH2W2\/runs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Accept",
+                            "value": "application\/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer <token>"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contactEmailStatus\": \"verified\",\n  \"includeEmails\": true,\n  \"personState\": [\n    \"{{ $json.output.personState }}\"\n  ],\n  \"personTitle\": [\n    \"{{ $json.output.jobTitle }}\"\n  ],\n  \"skipLeadsWithoutEmails\": true,\n  \"totalResults\": 1000\n}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                656,
+                560
+            ],
+            "id": "fbd7c097-4e09-4c51-9b46-fdac0d3ca77a",
+            "name": "runActor"
+        },
+        {
+            "parameters": {
+                "url": "=https:\/\/api.apify.com\/v2\/acts\/GlxYrQp6f3YAzH2W2\/runs\/{{ $('runActor').item.json.data.id }}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                992,
+                560
+            ],
+            "id": "bef933c6-c0cf-41a9-8b63-ac261ba912d7",
+            "name": "getRun"
+        },
+        {
+            "parameters": {
+                "url": "=https:\/\/api.apify.com\/v2\/actor-runs\/{{ $json.data.id }}\/dataset\/items",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Accept",
+                            "value": "application\/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer <token>"
+                        }
+                    ]
+                },
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                1408,
+                560
+            ],
+            "id": "ecf27d58-7a63-4270-9997-0717898d60c7",
+            "name": "getDatasetItems"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "2a1a9c24-cb62-46e7-95df-f1f2d3dd14a9",
+                            "name": "personName",
+                            "value": "={{ $json.fullName }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "35998659-1f18-4b6f-8147-3e44272283cd",
+                            "name": "title",
+                            "value": "={{ $json.position }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "ac0645a4-da7a-47cd-86c3-b758efcc9d88",
+                            "name": "email",
+                            "value": "={{ $json.email }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "5f4bf3c4-82b3-4a94-a53e-95b639f73a52",
+                            "name": "linkedIn",
+                            "value": "={{ $json.linkedinUrl }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "137bd3ce-275e-41c6-b5db-3c1318490e0f",
+                            "name": "organization_website",
+                            "value": "={{ $json.organizationWebsite }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "76d2a703-41ea-41f5-a5db-6e19e6e30e2b",
+                            "name": "person_location",
+                            "value": "={{ \n  [$json.city, $json.state, $json.country]\n    .filter(v => v && v.trim() !== '')\n    .join(', ')\n}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.399999999999999911182158029987476766109466552734375,
+            "position": [
+                2208,
+                576
+            ],
+            "id": "e575c20f-2f88-471c-9d54-f894f6cdd874",
+            "name": "setValues"
+        },
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ],
+                "additionalFields": []
+            },
+            "id": "d6668f5d-9dbf-40ab-a792-08777849cec9",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                160,
+                560
+            ],
+            "webhookId": "cd69684e-2e75-446e-b9c3-d67b67c1bf0c",
+            "credentials": {
+                "telegramApi": {
+                    "id": "uSX4Fzu9gdxI2leJ",
+                    "name": "LeadGenBot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+                "text": "=❌ Lead generation failed\n\nUnfortunately, I couldn't retrieve the data for your search.",
+                "additionalFields": {
+                    "appendAttribution": false,
+                    "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+                }
+            },
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                1408,
+                384
+            ],
+            "id": "4956929b-085d-419a-895d-202beccd8af9",
+            "name": "Send a failed message",
+            "webhookId": "f4fa465e-d8f6-40cd-8a06-cd03cda80a54",
+            "executeOnce": true,
+            "credentials": {
+                "telegramApi": {
+                    "id": "uSX4Fzu9gdxI2leJ",
+                    "name": "LeadGenBot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+                "text": "=✅ Lead generation completed successfully!\n\n📊 Summary:\n- Extracted: Total {{$items().length}} unique leads\n\n📋 Search Criteria:\n- Job Title: {{ $('Query Fixer').item.json.output.jobTitle }}\n- Location: {{\n  [\n    $('Query Fixer').item.json.output.personCity,\n    $('Query Fixer').item.json.output.personState,\n    $('Query Fixer').item.json.output.personCountry\n  ]\n  .filter(v => v && v.trim() !== '')\n  .join(', ')\n}}\n\nThank you for using LeadGenBot! 🚀",
+                "additionalFields": {
+                    "appendAttribution": false,
+                    "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+                }
+            },
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                2960,
+                576
+            ],
+            "id": "ca2014b4-d18b-4e95-bbf3-e1975f5292a4",
+            "name": "Send a success message",
+            "webhookId": "9cf3717b-a4f9-4199-8e8e-b5d73cf57821",
+            "executeOnce": true,
+            "credentials": {
+                "telegramApi": {
+                    "id": "uSX4Fzu9gdxI2leJ",
+                    "name": "LeadGenBot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "text": "={{ $json.message.text }}",
+                "attributes": {
+                    "attributes": [
+                        {
+                            "name": "personState",
+                            "description": "The state's name if only mentioned, otherwise leave it empty",
+                            "required": true
+                        },
+                        {
+                            "name": "jobTitle",
+                            "description": "The title of the job role",
+                            "required": true
+                        }
+                    ]
+                },
+                "options": {
+                    "systemPromptTemplate": "You are an expert extraction algorithm.\nMake sure to fix the country\/state name and job\/role title in a proper universal format"
+                }
+            },
+            "type": "@n8n\/n8n-nodes-langchain.informationExtractor",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                352,
+                560
+            ],
+            "id": "dd1472da-cd50-4f6f-a972-fabf7c8ee6a4",
+            "name": "Query Fixer"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                1616,
+                560
+            ],
+            "id": "2aecda16-5a7e-4ed7-aead-926a99403a01",
+            "name": "Aggregate"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "ef18ac62-d6c6-4426-a3f3-85b55603ecb0",
+                            "leftValue": "={{ $json.data[1].id }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "exists",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                1792,
+                560
+            ],
+            "id": "e7def6cb-de9c-4ec9-a815-db57b4207747",
+            "name": "If"
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "data",
+                "options": []
+            },
+            "type": "n8n-nodes-base.splitOut",
+            "typeVersion": 1,
+            "position": [
+                2000,
+                576
+            ],
+            "id": "a64daef1-a88d-4344-a9b7-d0d0ef1121d0",
+            "name": "Split Out"
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+                "text": "={{ $json.data[1].fullName.split('.')[0] + '.' }}",
+                "additionalFields": {
+                    "appendAttribution": false,
+                    "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+                }
+            },
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                2048,
+                384
+            ],
+            "id": "ace18ab2-24bb-467e-bd7c-64f43d744e11",
+            "name": "Send a error message",
+            "webhookId": "6d9fa3d2-08f5-4c2e-a710-4452a22f23e7",
+            "executeOnce": true,
+            "credentials": {
+                "telegramApi": {
+                    "id": "uSX4Fzu9gdxI2leJ",
+                    "name": "LeadGenBot"
+                }
+            }
+        }
+    ],
+    "pinData": [],
+    "connections": {
+        "Filter": {
+            "main": [
+                [
+                    {
+                        "node": "Remove Duplicates",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Remove Duplicates": {
+            "main": [
+                [
+                    {
+                        "node": "Google Sheets",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Query Fixer",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait": {
+            "main": [
+                [
+                    {
+                        "node": "getRun",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch": {
+            "main": [
+                [
+                    {
+                        "node": "Send a failed message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "getDatasetItems",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait1": {
+            "main": [
+                [
+                    {
+                        "node": "getRun",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Sheets": {
+            "main": [
+                [
+                    {
+                        "node": "Send a success message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "runActor": {
+            "main": [
+                [
+                    {
+                        "node": "Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getRun": {
+            "main": [
+                [
+                    {
+                        "node": "Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getDatasetItems": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "setValues": {
+            "main": [
+                [
+                    {
+                        "node": "Filter",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Query Fixer",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Query Fixer": {
+            "main": [
+                [
+                    {
+                        "node": "runActor",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "If",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If": {
+            "main": [
+                [
+                    {
+                        "node": "Send a error message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Split Out",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Out": {
+            "main": [
+                [
+                    {
+                        "node": "setValues",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "45db556f-19f9-4e1c-bb46-2369b513a67a",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "0b008bd86df5902c8c20987844e8ef7a6cf9a5639f4abd7f8a22764455c02c65"
+    },
+    "id": "Y4kxPceTI41x6J2x",
+    "tags": [
+        {
+            "updatedAt": "2025-11-06T05:26:25.199Z",
+            "createdAt": "2025-11-06T05:26:25.199Z",
+            "id": "VJhTxFHwqHheYnlo",
+            "name": "Template"
+        }
+    ]
+}

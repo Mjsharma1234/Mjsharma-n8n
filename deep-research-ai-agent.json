@@ -1,0 +1,2762 @@
+{
+    "name": "Deep Research - Template",
+    "nodes": [
+        {
+            "parameters": {
+                "formFields": {
+                    "values": [
+                        {
+                            "fieldLabel": "What would you like to research?",
+                            "fieldType": "textarea",
+                            "requiredField": true
+                        }
+                    ]
+                },
+                "options": {
+                    "formTitle": "DeepResearcher",
+                    "formDescription": "=<img\n  src=\"https:\/\/res.cloudinary.com\/daglih2g8\/image\/upload\/f_auto,q_auto\/v1\/n8n-workflows\/o4wqztloz3j6okfxpeyw\"\n  width=\"100%\"\n  style=\"border:1px solid #ccc\"\n\/>"
+                }
+            },
+            "id": "b077bcc1-b532-41bb-b768-c3a066d4a245",
+            "name": "Research Request",
+            "type": "n8n-nodes-base.form",
+            "position": [
+                -1700,
+                80
+            ],
+            "webhookId": "c2756106-76a7-4dd0-95d6-e413b73c9bc7",
+            "typeVersion": 1
+        },
+        {
+            "parameters": {
+                "schemaType": "manual",
+                "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"questions\": {\n      \"type\": \"array\",\n      \"description\": \"Follow up questions to clarify the research direction, max of 3.\",\n      \"items\": {\n          \"type\": \"string\"\n      }\n    }\n  }\n}"
+            },
+            "id": "577ab1c6-dc84-493b-9803-9759d86aa2cf",
+            "name": "Structured Output Parser1",
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "position": [
+                -1280,
+                280
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "output.questions",
+                "options": []
+            },
+            "id": "49fa1cf9-6e9d-406a-b904-61d6c9450f09",
+            "name": "Feedback to Items",
+            "type": "n8n-nodes-base.splitOut",
+            "position": [
+                -840,
+                140
+            ],
+            "typeVersion": 1
+        },
+        {
+            "parameters": {
+                "formFields": {
+                    "values": [
+                        {
+                            "fieldLabel": "={{ $json[\"output.questions\"] }}",
+                            "fieldType": "textarea",
+                            "placeholder": "=",
+                            "requiredField": true
+                        }
+                    ]
+                },
+                "options": {
+                    "formTitle": "DeepResearcher",
+                    "formDescription": "=<img\n  src=\"https:\/\/res.cloudinary.com\/daglih2g8\/image\/upload\/f_auto,q_auto\/v1\/n8n-workflows\/o4wqztloz3j6okfxpeyw\"\n  width=\"100%\"\n  style=\"border:1px solid #ccc\"\n\/>\n<p style=\"text-align:left\">\nAnswer the following clarification questions to assist the DeepResearcher better under the research topic.\n<\/p>\n<hr style=\"display:block;margin-top:16px;margin-bottom:0\" \/>\n<p style=\"text-align:left;font-family:sans-serif;font-weight:700;\">\nTotal {{ $('Feedback to Items').all().length }} questions.\n<\/p>",
+                    "buttonLabel": "Answer"
+                }
+            },
+            "id": "0e1a7609-089c-40f3-8ab7-206e49887132",
+            "name": "Ask Clarity Questions",
+            "type": "n8n-nodes-base.form",
+            "position": [
+                -380,
+                280
+            ],
+            "webhookId": "646e3575-55c3-4703-8daf-3155eb470a86",
+            "typeVersion": 1
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "id": "a027567d-47d3-458f-b91e-5101fc2355c4",
+            "name": "For Each Question...",
+            "type": "n8n-nodes-base.splitInBatches",
+            "position": [
+                -620,
+                140
+            ],
+            "typeVersion": 3
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=Given the following query from the user, ask follow-up questions to clarify the research direction. Return a maximum of 3 questions, but feel free to return fewer if the original query is already clear.\n\nRespond in **strict JSON** format as shown below:\n\nIf clarification is needed:\n```json\n{\n  \"questions\": [\n    \"What is the intended outcome of this research?\",\n    \"Are there specific technologies or tools you want to include?\",\n    \"What’s your timeframe for implementation?\"\n  ]\n}\n\nIf no clarification is needed:\n{\n  \"questions\": [\"No clarification needed\"]\n}\n\nUser's query:\n<query>{{ $json[\"What would you like to research?\"] }}<\/query>",
+                "hasOutputParser": true,
+                "messages": {
+                    "messageValues": [
+                        {
+                            "type": "HumanMessagePromptTemplate",
+                            "message": "=You are an expert researcher. Today is {{ $now.toLocaleString() }}. Follow these instructions when responding:\n  - You may be asked to research subjects that is after your knowledge cutoff, assume the user is right when presented with news.\n  - The user is a highly experienced analyst, no need to simplify it, be as detailed as possible and make sure your response is correct.\n  - Be highly organized.\n  - Suggest solutions that I didn't think about.\n  - Be proactive and anticipate my needs.\n  - Treat me as an expert in all subject matter.\n  - Mistakes erode my trust, so be accurate and thorough.\n  - Provide detailed explanations, I'm comfortable with lots of detail.\n  - Value good arguments over authorities, the source is irrelevant.\n  - Consider new technologies and contrarian ideas, not just the conventional wisdom.\n  - You may use high levels of speculation or prediction, just flag it for me."
+                        }
+                    ]
+                }
+            },
+            "id": "af2e9b29-8387-486c-842e-a4f283debbbf",
+            "name": "Clarifying Questions",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                -1440,
+                80
+            ],
+            "typeVersion": 1.5
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "14b77741-c3c3-4bd2-be6e-37bd09fcea2b",
+                            "name": "query",
+                            "type": "string",
+                            "value": "=Initial query: {{ $('Research Request').item.json['What would you like to research?'] }}\n\nFollow-up Questions and Answers:\n{{\n$input.all()\n  .map(item => {\n    const q = Object.keys(item.json)[0];\n    const a = item.json[q];\n    return `question: ${q}nanswer: ${a}`;\n  })\n  .join('n')\n}}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "id": "dfffb35c-c2a0-4cac-b009-af3ca8a691bd",
+            "name": "Get Initial Query",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                -380,
+                -140
+            ],
+            "executeOnce": true,
+            "typeVersion": 3.399999999999999911182158029987476766109466552734375
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "74b89cb6-b9e3-4f09-b927-6e47a950eb44",
+            "name": "OpenAI Chat Model",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                -1480,
+                280
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.tavily.com\/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer (Enter you Tavily API)"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"query\": \"{{ $json.keyword }}\",\n  \"search_depth\": \"advanced\",\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"max_results\": 10\n}\n",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                1260,
+                0
+            ],
+            "id": "75866167-dcb2-4fc3-afd3-3a99e93f9b5c",
+            "name": "Tavily Search"
+        },
+        {
+            "parameters": {
+                "operation": "completion",
+                "completionTitle": "=Thank you for using DeepResearcher.",
+                "completionMessage": "=You may now close this window.",
+                "options": []
+            },
+            "id": "c89aa98a-269f-4b3e-93c6-fafc31f17482",
+            "name": "End Form",
+            "type": "n8n-nodes-base.form",
+            "position": [
+                240,
+                0
+            ],
+            "webhookId": "c0548878-7a3b-451d-b9e8-2c591a6caa16",
+            "typeVersion": 1
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "08ab0d2f-048f-49d4-9fbb-340e76bc84f1",
+                            "leftValue": "={{ $json.output.questions[0] }}",
+                            "rightValue": "No clarification needed",
+                            "operator": {
+                                "type": "string",
+                                "operation": "startsWith"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1060,
+                80
+            ],
+            "id": "46143123-40cc-4dff-95cb-e375720560c0",
+            "name": "Clarification Needed?"
+        },
+        {
+            "parameters": {
+                "jsCode": "const raw = $json;\nlet output;\n\ntry {\n  \/\/ Navigate to the nested string JSON output\n  const text = raw.output?.[0]?.content?.[0]?.text || '';\n  const parsed = JSON.parse(text);\n  output = parsed.search_query;\n} catch (e) {\n  output = \"fallback search query\";\n}\n\nreturn [{ json: { keyword: output } }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1020,
+                0
+            ],
+            "id": "cc6926bd-3c3f-432f-9481-257e5ea917f0",
+            "name": "Prepare Keywords (Code)"
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"top_ids\": [1, 2, 3]\n}\n"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                2480,
+                160
+            ],
+            "id": "0cc24547-1c2b-4af6-b08f-430ec3765b6c",
+            "name": "Structured Output Parser2"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "1528d5d8-25ef-4eea-ad2f-6e3207a8c46e",
+            "name": "OpenAI Chat Model2",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                2300,
+                160
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert AI assistant specializing in evaluating search results for technical research.\n\nThe user's original research question and context:\n\n\"\"\"\n{{ $json.query }}\n\"\"\"\n\nBelow are links retrieved from web search. Each includes a title, URL, and snippet (preview text).\n\n{{ $json.links.map(link => `- [${link.id}] Title: ${link.title}n  URL: ${link.url}n  Snippet: ${link.snippet}`).join('nn') }}\n\n---\n\n### Task:\nYour job is to select **up to 5 links** that are the **most helpful, relevant, and technically valuable** for answering the user's research query.\n\n- Use the **snippet as the primary signal** of the page’s content.\n- The **title** is a summary; the **snippet** gives actual context.\n- Prioritize resources that offer:\n  - Tutorials\n  - Code examples\n  - Implementation guides\n  - Well-organized documentation\n- Avoid vague, marketing, or duplicate results.\n- Consider what would actually help an experienced technical user take action.\n- The goal is **to help the user make tangible progress** — don’t just select general overviews.\n\n---\n\n### Respond in strict JSON like this:\n\n```json\n{\n  \"top_ids\": [2, 4, 5]\n}\n",
+                "hasOutputParser": true
+            },
+            "id": "0af11e4e-963b-4252-8a9d-4a0b4638bcbe",
+            "name": "LLM Relevance Filter",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                2340,
+                -80
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.100000000000000088817841970012523233890533447265625,
+            "position": [
+                1740,
+                -80
+            ],
+            "id": "5f0ad7b6-5689-4904-949c-fb117477a9df",
+            "name": "Merge"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "0414e1c0-2359-4141-8e32-fd918961fbcd",
+            "name": "OpenAI Chat Model5",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                6920,
+                620
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a 🎯 senior AI research analyst tasked with writing a comprehensive, clear, and technically actionable research report based solely on the findings from one research pass.\n\nUse only the information provided below. Do **not** hallucinate or invent any facts. Structure the report clearly for an experienced user who wants to implement the solution with confidence.\n\n---\n\n### ❓ User Question:\n{{ $json.query }}\n\n---\n\n### 🧠 Synthesized Answer (Pass 1):\n{{ $json.answer }}\n\n---\n\n### 📚 References:\n{{ $json.sources.map((s, i) => `- [${i + 1}] ${s.url}`).join('n') }}\n\n---\n\n### 📝 Report Instructions:\n\nYou must write a detailed research report using **valid Markdown** format only.\n\nYour report should include these sections, with structured formatting and inline citations in `[n]` format:\n\n- `# 📘 Deep Research Report: \"Short Descriptive Title\"`\n- `## Introduction` — Briefly restate the user's query and context\n- `## Key Goals` — List 2–4 bullet points summarizing user needs\n- `## Technical Insights` — Provide a synthesized answer based on Pass 1, citing sources\n- `## Recommended Tools & Approaches` — Bullet out specific tools, APIs, frameworks or methods mentioned, citing sources inline\n- `## Implementation Guidance` — Offer step-by-step instructions (or architecture outline) using bullet points or numbered lists\n- `## Conclusion` — Provide a short summary and recommendation for how the user should proceed\n- `## References` — A list of links numbered in `[n]` format (do not repeat titles)\n\n---\n\n✅ Output Format:\n\nReturn a **single valid JSON object** in the following structure:\n\n```json\n{\n  \"title\": \"string (short descriptive title for the report)\",\n  \"markdown\": \"string (complete report in Markdown using the structure above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}\n\n❌ Do NOT include backticks, explanations, or extra commentary before or after.\n❌ Do NOT hallucinate facts.",
+                "hasOutputParser": true
+            },
+            "id": "1f80116c-8f8b-4beb-abf1-b2997a12ec0a",
+            "name": "Final Report Generator",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                6920,
+                380
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": false,
+            "retryOnFail": true,
+            "waitBetweenTries": 5000
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "6a67b82d-f779-4ac4-958e-977051d6c60b",
+                            "name": "query",
+                            "value": "={{$json[\"What would you like to research?\"] || $json.refined_query}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.399999999999999911182158029987476766109466552734375,
+            "position": [
+                -1980,
+                80
+            ],
+            "id": "13b4d338-4568-4b72-9cfb-64765fd96081",
+            "name": "Set Query from Form"
+        },
+        {
+            "parameters": {
+                "formTitle": " DeepResearcher",
+                "formDescription": "=DeepResearcher is a multi-step, recursive approach using the internet to solve complex research tasks, accomplishing in tens of minutes what a human would take many hours.\n\nThe workflow is designed to complete independently and when finished, a report will be saved in a designated Notion Database.",
+                "formFields": {
+                    "values": [
+                        {
+                            "fieldType": "html"
+                        }
+                    ]
+                },
+                "options": {
+                    "buttonLabel": "Next",
+                    "path": "deep_research",
+                    "ignoreBots": true
+                }
+            },
+            "id": "fbd75323-302f-4037-8b62-83e5f035fab4",
+            "name": "Start",
+            "type": "n8n-nodes-base.formTrigger",
+            "position": [
+                -2220,
+                80
+            ],
+            "webhookId": "c3fe06dd-a86d-4472-b73d-1dad24dbba54",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "c64c3561-2d07-45de-a000-2573128db72d",
+            "name": "OpenAI Chat Model3",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                2980,
+                180
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert technical assistant helping answer a research question using multiple online sources.\n\n---\n\n📌 User’s Research Question:\n\"\"\"{{ $items()[0].json.query }}\"\"\"\n\n🔍 Search Query Used:\n\"\"\"{{ $('Tavily Search').first().json.query }}\"\"\"\n\n📚 Web Page Sources:\n\n{{ $items().map((item, i) => `Source [${i+1}]:nTitle: ${item.json.title}nURL: ${item.json.url}nContent:n${item.json.content}`).join('nn') }}\n\n---\n\n🎯 Task:\n\nCarefully read all sources above and write a helpful, complete answer to the research question.\n\n- Use citations like [1], [2] to reference sources by order.\n- Summarize and synthesize across pages.\n- Avoid guessing — use only info found in the content.\n- Highlight implementation details, examples, or product features.\n\n---\n\nYou must return your response strictly in this JSON format (do not include markdown or extra text):\n\n{\n  \"question\": \"Paste full user query with Follow-up Questions and Answers\",\n  \"search_query\": \"Paste the search query used\",\n  \"answer\": \"Your synthesized answer using inline citations like [1], [2]\",\n  \"sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/example.com\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Title of Source 2\",\n      \"url\": \"https:\/\/example2.com\"\n    }\n  ]\n}\n\nOnly output valid JSON, and nothing else. Do not wrap in backticks (```) or include explanation before or after.",
+                "hasOutputParser": true
+            },
+            "id": "373304b0-1fcb-4e03-aa74-d0e85a555d8a",
+            "name": "Filter Relevant Content per Page",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                3040,
+                -60
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true,
+            "retryOnFail": true,
+            "waitBetweenTries": 5000
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all();\n\n\/\/ Extract the query from the item that contains it (likely has 'query' in it)\nconst queryItem = items.find(i => i.json.query);\nconst query = queryItem?.json.query || 'No query provided';\n\n\/\/ Extract search results (those with title\/snippet\/url\/content)\nconst searchResults = items\n  .filter(i => i.json.content && i.json.title && i.json.url)\n  .map((item, index) => ({\n    id: index + 1,\n    title: item.json.title || '',\n    snippet: item.json.snippet || '',\n    url: item.json.url || '',\n    content: item.json.content || ''\n  }));\n\n\/\/ Public version without full content\nconst publicLinks = searchResults.map(({ id, title, snippet, url }) => ({\n  id,\n  title,\n  snippet,\n  url\n}));\n\nreturn [\n  {\n    json: {\n      query,\n      links: publicLinks,\n      originalResults: searchResults\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2060,
+                -80
+            ],
+            "id": "ced44cfb-1f5c-46b9-8de6-d4e44c0a623e",
+            "name": "Build Relevance Filter Input"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fullResults = $items('Build Relevance Filter Input')[0].json.originalResults || [];\nconst query = $items('Build Relevance Filter Input')[0].json.query;\nconst topIds = $json.output.top_ids || [];\n\n\/\/ Find matching pages by ID\nconst selectedPages = topIds.map(id => {\n  const match = fullResults.find(r => r.id === id);\n  return {\n    title: match?.title || `Missing Title (ID: ${id})`,\n    url: match?.url || `Missing URL (ID: ${id})`,\n    content: match?.content || 'NO CONTENT FOUND',\n    query,\n  };\n});\n\nreturn selectedPages.map(item => ({ json: item }));"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2780,
+                -80
+            ],
+            "id": "a74be1f9-c940-4b6f-accf-aa8bddcaf911",
+            "name": "Prepare Sources for Content Extraction"
+        },
+        {
+            "parameters": {
+                "jsCode": "const inputData = $('Get Initial Query').first().json.query || 'unknown';\n\nconst promptText = `You are a senior technical assistant specialized in crafting precise, natural-sounding Google search queries for developers and researchers.\n\nThe user has described a technical problem. Your task is to:\n- Understand their goal thoroughly.\n- Generate **one single, complete search query** written as a natural sentence.\n- Think like a developer typing a realistic query into Google to solve a problem.\n- Avoid keyword-stacking (e.g., \"n8n youtube trigger monitor\") — this is NOT helpful.\n- Use clear, specific, and natural phrasing that includes key tools or APIs.\n- Prioritize quality over brevity — it's okay if the query is 8–14 words long.\n\n---\n\n### ✅ Format: Always return JSON like this:\n\n{\n  \"search_query\": \"realistic search phrase\"\n}\n\n---\n\n### 🧪 Few-Shot Examples:\n\n**Example 1**  \nUser Input:  \n\"I want to connect a Google Sheet to a backend API and trigger updates when new rows are added. It should push the data to a Node.js Express server in real time.\"  \nOutput:\n{\n  \"search_query\": \"google sheets webhook to Node.js Express server real-time update\"\n}\n\n---\n\n**Example 2**  \nUser Input:  \n\"I'm building a chatbot using LangChain and OpenAI. How can I let it search the web before answering user questions?\"  \nOutput:\n{\n  \"search_query\": \"langchain web search tool OpenAI agent integration\"\n}\n\n---\n\n**Example 3**  \nUser Input:  \n\"I want to automatically back up my PostgreSQL database every night to an AWS S3 bucket using a cron job.\"  \nOutput:\n{\n  \"search_query\": \"postgresql nightly backup to AWS S3 using cron\"\n}\n\n---\n\n**Example 4**  \nUser Input:  \n\"I have an image which was AI generated and has a human face in it. I want to change the face in the image to my own face. Which is the best API provider to do this? I am looking for both open source and also paid API providers. I am also open to building my own self-hosted solution using open source tools available. Please let me know the best way forward.\"  \nOutput:\n{\n  \"search_query\": \"face swap API or open source tool to replace face in image\"\n}\n\n---\n\n### 🔎 Now generate a query for this user input:\n\n\"\"\"${inputData}\"\"\"\n\n⚠️ Do not include explanations, markdown, line breaks, or trailing commas.\n⚠️ Only return the JSON object exactly as shown above.\n\n`;\n\nreturn [\n  {\n    json: {\n      model: \"gpt-4.1\",\n      input: [\n        {\n          role: \"system\",\n          content: [\n            {\n              type: \"input_text\",\n              text: `User goal: ${inputData}`\n            }\n          ]\n        },\n        {\n          role: \"user\",\n          content: [\n            {\n              type: \"input_text\",\n              text: promptText\n            }\n          ]\n        }\n      ],\n      temperature: 0.7,\n      top_p: 1,\n      max_output_tokens: 512,\n      text: {\n        format: {\n          type: \"text\"\n        }\n      },\n      reasoning: {},\n      tools: [\n        {\n          type: \"web_search_preview\",\n          user_location: {\n            type: \"approximate\"\n          },\n          search_context_size: \"high\"\n        }\n      ],\n      store: true\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                520,
+                0
+            ],
+            "id": "ffc595ca-bd07-4f2c-8715-4f27a329c9b4",
+            "name": "Prepare GPT-4.1 Input"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.openai.com\/v1\/responses",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "openAiApi",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application\/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json }}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                760,
+                0
+            ],
+            "id": "7984e59c-0014-48b3-9702-4142035bf4b6",
+            "name": "HTTP Request",
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "return $input.all().flatMap(item => {\n  const results = item.json.results || [];\n\n  if (!Array.isArray(results)) return [];\n\n  return results\n    .filter(result => result.raw_content && result.raw_content.trim() !== '') \/\/ Filter out empty content\n    .map(result => {\n      return {\n        json: {\n          title: result.title || '',\n          snippet: result.content || '', \/\/ Short description or summary\n          url: result.url || '',\n          content: result.raw_content || '' \/\/ ✅ Full raw content (most useful)\n        },\n      };\n    });\n});\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1500,
+                0
+            ],
+            "id": "706a719b-5371-44b8-9373-0c92f420e1db",
+            "name": "Format Tavily Results"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "1ca917c5-eecb-4401-bdc1-5c0bdda6c3b8",
+            "name": "OpenAI Chat Model4",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                4680,
+                200
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert research analyst.\n\nYour task is to determine whether the user’s original question has been fully and accurately answered based on the content provided.\n\nIf the answer is not sufficient, you must suggest a better, more focused search query — but do not repeat or closely mimic the original search query used.\n---\n\n📌 User Question:\n{{ $json.question }}\n\n🔍 Original Search Query Used:\n{{ $json.search_query }}\n\n🧠 Answer Provided:\n{{ $json.answer }}\n\n---\n\n🔍 Evaluation Guidelines\nEvaluate whether the answer satisfies the user’s question using these criteria:\n\n✅ Direct Relevance: Does the answer specifically address what was asked?\n\n✅ Completeness: Are all key requirements or constraints addressed (e.g., cost, platform, input method, no-API, etc.)?\n\n✅ Usability: Can the user apply this answer directly? Is it actionable without major missing steps?\n\n✅ Clarity: Is the explanation clear, with no ambiguity or gaps?\n\n---\n\n❌ Mark \"answered\": \"no\" if:\nThe answer only partially meets the question\n\nIt says no solution exists, but the user was clearly looking for a working one\n\nIt gives vaguely related info that doesn't satisfy the full intent\n\nIt tells the user to build something themselves, but they asked for a ready-made solution\n\nIt ignores specific constraints, such as \"no third-party APIs\", \"offline only\", or \"must support YouTube input\"\n\n---\n\n🔁 If \"answered\" is \"no\", follow these rules for next_search_query:\n✅ Suggest a better, more focused search query\n\n❌ Do not repeat or slightly reword the original search query — it must be meaningfully different\n\n✅ Focus the new query on what was missing or incomplete in the answer\n\n✅ Be specific (e.g., add platform, input type, tool names, format details, GitHub if needed)\n\n✅ Favor searches that could lead to existing tutorials, projects, or tools\n\n---\n\n✅ Output Format (strictly this JSON):\n\n{\n  \"answered\": \"yes\" | \"no\",\n  \"next_search_query\": \"Leave blank if answered is yes. If not, provide a clearly improved, more focused search phrase that is different from the original query.\"\n}\n\n---\n\n🧠 Examples:\n✅ Fully Answered Example:\n\nQuestion: What’s a free and open-source tool to generate subtitles from a video file offline?\nOriginal Search Query: open-source offline subtitle generator\nAnswer: You can use Whisper by OpenAI. It’s open-source, runs offline, and can generate subtitles with the --task translate flag.\n\n{\n  \"answered\": \"yes\",\n  \"next_search_query\": \"\"\n}\n\n---\n\n❌ Not Answered Example:\nQuestion: I want an app that runs offline and helps ADHD users manage tasks without cloud syncing.\nOriginal Search Query: adhd open-source task manager app\nAnswer: Most apps use cloud sync. You might have to build your own app.\n\n{\n  \"answered\": \"no\",\n  \"next_search_query\": \"offline open-source ADHD task manager app without cloud sync\"\n}\n\n\n",
+                "hasOutputParser": true
+            },
+            "id": "99701a08-d528-4bb5-b0fa-8ad8679ba32e",
+            "name": "Evaluate Answer Completeness",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                4720,
+                -140
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true,
+            "onError": "continueRegularOutput"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $json.output || $json;\n\nreturn [{\n  json: {\n    question: data.question || '',\n    search_query: data.search_query || '',\n    answer: data.answer || '',\n    sources: data.sources || []\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                4080,
+                180
+            ],
+            "id": "b643f400-a150-4282-9688-0decca38747c",
+            "name": "Prepare Evaluation Input"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "c7cd25e9-31ab-4c2a-8880-0148aea726c2",
+                            "leftValue": "={{ $json.answered }}",
+                            "rightValue": "yes",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "or"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                5600,
+                400
+            ],
+            "id": "38310bf3-d554-4124-8a43-a39360c4062a",
+            "name": "Check If Query Fully Answered"
+        },
+        {
+            "parameters": {
+                "jsCode": "\/\/ Code to extract JSON from string inside `text`\nconst raw = $json.text;\n\n\/\/ Extract JSON block\nconst jsonMatch = raw.match(\/{[sS]*}\/);\nif (!jsonMatch) {\n  return [{ json: { error: \"No valid JSON found in text\" } }];\n}\n\nconst parsed = JSON.parse(jsonMatch[0]);\nreturn [{ json: parsed }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                5180,
+                -140
+            ],
+            "id": "20dcf606-90b8-4526-86b9-767eb4696c2d",
+            "name": "Parse LLM Output to JSON"
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"top_ids\": [1, 2, 3]\n}\n"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                2060,
+                1140
+            ],
+            "id": "b21ba7b4-dcd2-4138-a451-8555ec2e7e5a",
+            "name": "Structured Output Parser3"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "ba963f0a-e36e-4cc0-ba2f-082199637911",
+            "name": "OpenAI Chat Model6",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                1880,
+                1140
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "f5d098da-8773-42ad-94ed-1bc23673d97e",
+            "name": "OpenAI Chat Model7",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                2780,
+                980
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"question\": \"Paste full user query here\",\n  \"loop2_search_query\": \"Paste the search query used\",\n  \"loop2_answer\": \"Final answer based on content, using inline citations like [1], [3]\",\n  \"loop2_sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/source1.com\"\n    }\n  ]\n}"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                3360,
+                1120
+            ],
+            "id": "428ed0d8-d1ae-4450-943d-2395f835c73f",
+            "name": "Structured Output Parser5"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "ca9b96ad-ffdd-4cb9-9e14-50048503aa60",
+            "name": "OpenAI Chat Model8",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                4260,
+                1200
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"top_ids\": [1, 2, 3]\n}\n"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                4120,
+                2260
+            ],
+            "id": "6819bfb5-08ed-4a93-8c92-1eb74260abda",
+            "name": "Structured Output Parser6"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "6910960b-c6b3-4052-b52f-132f4a65f311",
+            "name": "OpenAI Chat Model9",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                3940,
+                2260
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "3f7c5419-8666-48ae-be57-7fdcbd5f98d7",
+            "name": "OpenAI Chat Model10",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                4740,
+                2220
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.tavily.com\/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer (Enter you Tavily API)"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"query\": \"{{ $json.next_search_query }}\",\n  \"search_depth\": \"advanced\",\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"max_results\": 10\n}\n",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                840,
+                980
+            ],
+            "id": "fe3dc785-62cd-4978-9f11-9d0897354645",
+            "name": "Loop2_Tavily Search1"
+        },
+        {
+            "parameters": {
+                "jsCode": "return $input.all().flatMap(item => {\n  const results = item.json.results || [];\n\n  if (!Array.isArray(results)) return [];\n\n  return results\n    .filter(result => result.raw_content && result.raw_content.trim() !== '') \/\/ Filter out empty content\n    .map(result => {\n      return {\n        json: {\n          title: result.title || '',\n          snippet: result.content || '', \/\/ Short description or summary\n          url: result.url || '',\n          content: result.raw_content || '' \/\/ ✅ Full raw content (most useful)\n        },\n      };\n    });\n});\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1080,
+                980
+            ],
+            "id": "a09ed536-8aa0-42b2-95c3-383e27433464",
+            "name": "Loop2_Format Tavily Results1"
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.100000000000000088817841970012523233890533447265625,
+            "position": [
+                1320,
+                900
+            ],
+            "id": "b4639698-6b8c-4732-a400-d2df6c12324c",
+            "name": "Loop2_Merge1"
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all();\n\n\/\/ Extract the query from the item that contains it (likely has 'query' in it)\nconst queryItem = items.find(i => i.json.query);\nconst query = queryItem?.json.query || 'No query provided';\n\n\/\/ Extract search results (those with title\/snippet\/url\/content)\nconst searchResults = items\n  .filter(i => i.json.content && i.json.title && i.json.url)\n  .map((item, index) => ({\n    id: index + 1,\n    title: item.json.title || '',\n    snippet: item.json.snippet || '',\n    url: item.json.url || '',\n    content: item.json.content || ''\n  }));\n\n\/\/ Public version without full content\nconst publicLinks = searchResults.map(({ id, title, snippet, url }) => ({\n  id,\n  title,\n  snippet,\n  url\n}));\n\nreturn [\n  {\n    json: {\n      query,\n      links: publicLinks,\n      originalResults: searchResults\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1640,
+                900
+            ],
+            "id": "d8b80785-dd9b-4676-9eb1-f40b2316afcf",
+            "name": "Loop2_Build Relevance Filter Input1"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert AI assistant specializing in evaluating search results for technical research.\n\nThe user's original research question and context:\n\n\"\"\"\n{{ $json.query }}\n\"\"\"\n\nBelow are links retrieved from web search. Each includes a title, URL, and snippet (preview text).\n\n{{ $json.links.map(link => `- [${link.id}] Title: ${link.title}n  URL: ${link.url}n  Snippet: ${link.snippet}`).join('nn') }}\n\n---\n\n### Task:\nYour job is to select **up to 5 links** that are the **most helpful, relevant, and technically valuable** for answering the user's research query.\n\n- Use the **snippet as the primary signal** of the page’s content.\n- The **title** is a summary; the **snippet** gives actual context.\n- Prioritize resources that offer:\n  - Tutorials\n  - Code examples\n  - Implementation guides\n  - Well-organized documentation\n- Avoid vague, marketing, or duplicate results.\n- Consider what would actually help an experienced technical user take action.\n- The goal is **to help the user make tangible progress** — don’t just select general overviews.\n\n---\n\n### Respond in strict JSON like this:\n\n```json\n{\n  \"top_ids\": [2, 4, 5]\n}\n",
+                "hasOutputParser": true
+            },
+            "id": "78e0f1d2-23ca-4aea-b5bb-98d428278177",
+            "name": "Loop2_LLM Relevance Filter1",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                1920,
+                900
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true
+        },
+        {
+            "parameters": {
+                "jsCode": "const fullResults = $items('Loop2_Build Relevance Filter Input1')[0].json.originalResults || [];\nconst query = $items('Loop2_Build Relevance Filter Input1')[0].json.query;\nconst topIds = $json.output.top_ids || [];\n\n\/\/ Find matching pages by ID\nconst selectedPages = topIds.map(id => {\n  const match = fullResults.find(r => r.id === id);\n  return {\n    title: match?.title || `Missing Title (ID: ${id})`,\n    url: match?.url || `Missing URL (ID: ${id})`,\n    content: match?.content || 'NO CONTENT FOUND',\n    query,\n  };\n});\n\nreturn selectedPages.map(item => ({ json: item }));"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2360,
+                900
+            ],
+            "id": "558c6972-056a-4ad8-80d5-013c9923d1c3",
+            "name": "Loop2_Prepare Sources for Content Extraction1"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert technical assistant helping answer a research question using multiple online sources.\n\n---\n\n📌 User’s Research Question (with follow-ups):\n\"\"\n{{ $items()[0].json.query }}\n\"\"\"\n\n🔍 Search Query Used:\n\"\"\"\n{{ $('Loop2_Tavily Search1').first().json.query }}\n\"\"\"\n\n📚 Web Page Sources:\n\n{{ $items().map((item, i) => `Source [${i+1}]:\nTitle: ${item.json.title}\nURL: ${item.json.url}\nContent:\n${item.json.content}`).join('nn') }}\n\n---\n\n🎯 Task:\n\nCarefully read all pages above, write a complete answer to the user’s research question.\n\n- Write a complete and helpful answer to the user’s research question\n- If you use info from a specific page, cite it inline as [1], [2], etc. based on its order\n- Use facts, examples, and implementation insights found in the content\n- Do not guess — base your answer on what’s actually written\n- If multiple pages say the same thing, summarize without repetition\n- If different sources provide unique points, combine them meaningfully\n\nYou must return your response strictly in this JSON format:\n{\n  \"question\": \"Paste full user query here\",\n  \"loop2_search_query\": \"Paste the search query used\",\n  \"loop2_answer\": \"Final answer based on content, using inline citations like [1], [3]\",\n  \"loop2_sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/source1.com\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Title of Source 2\",\n      \"url\": \"https:\/\/source2.com\"\n    }\n  ]\n}\n\n\n🛑 Output only valid JSON, and nothing else. Do not wrap it in ```json or any markdown.",
+                "hasOutputParser": true
+            },
+            "id": "82058985-0597-49cf-8f42-f50cb89c1b16",
+            "name": "Loop2_Filter Relevant Content per Page1",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                2860,
+                740
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true,
+            "retryOnFail": true,
+            "waitBetweenTries": 5000,
+            "alwaysOutputData": false
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $json.output || $json;\n\nreturn [{\n  json: {\n    question: data.question || '',\n    loop2_search_query: data.loop2_search_query || '',\n    loop2_answer: data.loop2_answer || '',\n    loop2_sources: data.loop2_sources || []\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                3800,
+                940
+            ],
+            "id": "a904f1c7-7320-47dd-abde-5bb6b9a213d7",
+            "name": "Loop2_Prepare Evaluation Input1"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert research analyst.\n\nYour task is to determine whether the user’s original question has been fully and accurately answered based on the content provided.\n\nIf the answer is not sufficient, you must suggest a better, more focused search query — but do not repeat or closely mimic the original search query used.\n\n---\n\n📌 User Question with Clarifications:\n{{ $json.question }}\n\n---\n\n🔍 Search Query Used:\n{{ $json.loop2_search_query }}\n\n🧠 Answer provided:\n{{ $json.loop2_answer }}\n\n---\n\n🎯 Evaluation Criteria\n\n✅ Relevance: Do the answers directly address the user’s specific request?\n\n✅ Completeness: Are **all constraints** fulfilled? (e.g., \"no APIs\", \"file and YouTube input\", \"content-aware resizing\", \"existing workflow\", etc.)\n\n✅ Actionable: Can the user apply the final answer directly without having to build everything from scratch?\n\n✅ Clarity: Is the final solution clearly explained and usable?\n\n---\n\n🧠 Final Task\n\nConsider the **combined value of both answers**. If the user now has a working or buildable solution that meets their requirements, mark it as `\"answered\": \"yes\"`. If not, mark `\"answered\": \"no\"`.\n\nIf not answered, suggest a **new search query** that:\n- 🚫 Is not just a minor variation of either previous search query\n- ✅ Focuses on what is still missing\n- ✅ Could realistically retrieve tutorials, GitHub repos, or pre-built solutions\n\n---\n\n✅ Output Format:\n```json\n{\n  \"answered\": \"yes\" | \"no\",\n  \"next_search_query\": \"Leave blank if answered is yes. If not, provide a clearly improved search phrase.\"\n}\n",
+                "hasOutputParser": true
+            },
+            "id": "ec4e3d38-68a3-495c-83eb-261bcd4a2e1c",
+            "name": "Loop2_Evaluate Answer Completeness1",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                4280,
+                880
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true,
+            "onError": "continueRegularOutput"
+        },
+        {
+            "parameters": {
+                "jsCode": "\/\/ Code to extract JSON from string inside `text`\nconst raw = $json.text;\n\n\/\/ Extract JSON block\nconst jsonMatch = raw.match(\/{[sS]*}\/);\nif (!jsonMatch) {\n  return [{ json: { error: \"No valid JSON found in text\" } }];\n}\n\nconst parsed = JSON.parse(jsonMatch[0]);\nreturn [{ json: parsed }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                4920,
+                900
+            ],
+            "id": "be88302b-c24e-41e6-ad32-3004f9107291",
+            "name": "Loop2_Parse LLM Output to JSON1"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "54a5ba59-51cf-4180-abc4-0ae68d25ad0b",
+                            "leftValue": "={{ $json.answered }}",
+                            "rightValue": "yes",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                5960,
+                1460
+            ],
+            "id": "b92693ab-8b8a-47aa-b2ee-f9d947f88b11",
+            "name": "Check Loop2 Answered"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/api.tavily.com\/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer (Enter you Tavily API)"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"query\": \"{{ $json.next_search_query }}\",\n  \"search_depth\": \"advanced\",\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"max_results\": 10\n}\n",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                2900,
+                2100
+            ],
+            "id": "00e1ca30-8d78-4ac2-a35c-1b3e59ecc9ab",
+            "name": "Loop3_Tavily Search2"
+        },
+        {
+            "parameters": {
+                "jsCode": "return $input.all().flatMap(item => {\n  const results = item.json.results || [];\n\n  if (!Array.isArray(results)) return [];\n\n  return results\n    .filter(result => result.raw_content && result.raw_content.trim() !== '') \/\/ Filter out empty content\n    .map(result => {\n      return {\n        json: {\n          title: result.title || '',\n          snippet: result.content || '', \/\/ Short description or summary\n          url: result.url || '',\n          content: result.raw_content || '' \/\/ ✅ Full raw content (most useful)\n        },\n      };\n    });\n});\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                3140,
+                2100
+            ],
+            "id": "b35b67d9-b30b-4710-8ec1-360bc16957bb",
+            "name": "Loop3_Format Tavily Results2"
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.100000000000000088817841970012523233890533447265625,
+            "position": [
+                3380,
+                2020
+            ],
+            "id": "3069ed66-df66-4f8e-bcb0-b31e2e57d2d7",
+            "name": "Loop3_Merge2"
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all();\n\n\/\/ Extract the query from the item that contains it (likely has 'query' in it)\nconst queryItem = items.find(i => i.json.query);\nconst query = queryItem?.json.query || 'No query provided';\n\n\/\/ Extract search results (those with title\/snippet\/url\/content)\nconst searchResults = items\n  .filter(i => i.json.content && i.json.title && i.json.url)\n  .map((item, index) => ({\n    id: index + 1,\n    title: item.json.title || '',\n    snippet: item.json.snippet || '',\n    url: item.json.url || '',\n    content: item.json.content || ''\n  }));\n\n\/\/ Public version without full content\nconst publicLinks = searchResults.map(({ id, title, snippet, url }) => ({\n  id,\n  title,\n  snippet,\n  url\n}));\n\nreturn [\n  {\n    json: {\n      query,\n      links: publicLinks,\n      originalResults: searchResults\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                3700,
+                2020
+            ],
+            "id": "081611a5-126a-4eb1-96d6-1141f4061cba",
+            "name": "Loop3_Build Relevance Filter Input2"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert AI assistant specializing in evaluating search results for technical research.\n\nThe user's original research question and context:\n\n\"\"\"\n{{ $json.query }}\n\"\"\"\n\nBelow are links retrieved from web search. Each includes a title, URL, and snippet (preview text).\n\n{{ $json.links.map(link => `- [${link.id}] Title: ${link.title}n  URL: ${link.url}n  Snippet: ${link.snippet}`).join('nn') }}\n\n---\n\n### Task:\nYour job is to select **up to 5 links** that are the **most helpful, relevant, and technically valuable** for answering the user's research query.\n\n- Use the **snippet as the primary signal** of the page’s content.\n- The **title** is a summary; the **snippet** gives actual context.\n- Prioritize resources that offer:\n  - Tutorials\n  - Code examples\n  - Implementation guides\n  - Well-organized documentation\n- Avoid vague, marketing, or duplicate results.\n- Consider what would actually help an experienced technical user take action.\n- The goal is **to help the user make tangible progress** — don’t just select general overviews.\n\n---\n\n### Respond in strict JSON like this:\n\n```json\n{\n  \"top_ids\": [2, 4, 5]\n}\n",
+                "hasOutputParser": true
+            },
+            "id": "7f1f10df-a933-4f62-b3ab-bcd80406bc89",
+            "name": "Loop3_LLM Relevance Filter2",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                3980,
+                2020
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true
+        },
+        {
+            "parameters": {
+                "jsCode": "const fullResults = $items('Loop3_Build Relevance Filter Input2')[0].json.originalResults || [];\nconst query = $items('Loop3_Build Relevance Filter Input2')[0].json.query;\nconst topIds = $json.output.top_ids || [];\n\n\/\/ Find matching pages by ID\nconst selectedPages = topIds.map(id => {\n  const match = fullResults.find(r => r.id === id);\n  return {\n    title: match?.title || `Missing Title (ID: ${id})`,\n    url: match?.url || `Missing URL (ID: ${id})`,\n    content: match?.content || 'NO CONTENT FOUND',\n    query,\n  };\n});\n\nreturn selectedPages.map(item => ({ json: item }));"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                4420,
+                2020
+            ],
+            "id": "a5ba2a26-885c-4905-8612-12ad0274c881",
+            "name": "Loop3_Prepare Sources for Content Extraction2"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert technical assistant helping answer a research question using multiple online sources.\n\n---\n\n📌 User’s Research Question (with follow-ups):\n\"\"\"\n{{ $items()[0].json.query }}\n\"\"\"\n\n🔍 Search Query Used:\n\"\"\"\n{{ $('Loop3_Tavily Search2').first().json.query }}\n\"\"\"\n\n📚 Web Page Sources:\n\n{{ $items().map((item, i) => `Source [${i+1}]:\nTitle: ${item.json.title}\nURL: ${item.json.url}\nContent:\n${item.json.content}`).join('nn') }}\n\n---\n\n🎯 Task:\n\nCarefully read all pages above, write a complete answer to the user’s research question.\n\n- Write a complete and helpful answer to the user’s research question\n- If you use info from a specific page, cite it inline as [1], [2], etc. based on its order\n- Use facts, examples, and implementation insights found in the content\n- Do not guess — base your answer on what’s actually written\n- If multiple pages say the same thing, summarize without repetition\n- If different sources provide unique points, combine them meaningfully\n\n---\n\nYou must return your response strictly in this JSON format:\n{\n  \"question\": \"Paste full user query here\",\n  \"loop3_search_query\": \"Paste the search query used\",\n  \"loop3_answer\": \"Final answer based on content, using inline citations like [1], [3]\",\n  \"loop3_sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/source1.com\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Title of Source 2\",\n      \"url\": \"https:\/\/source2.com\"\n    }\n  ]\n}\n\n\n🛑 Output only valid JSON, and nothing else. Do not wrap it in ```json or any markdown.",
+                "hasOutputParser": true
+            },
+            "id": "7333e4c7-ad4e-47dd-8ab6-8b31be3e2882",
+            "name": "Loop3_Filter Relevant Content per Page2",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                4860,
+                2000
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": true,
+            "retryOnFail": true,
+            "waitBetweenTries": 5000
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"title\": \"string (short descriptive title for the report)\",\n  \"markdown\": \"string (complete report in Markdown using the structure above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                7380,
+                800
+            ],
+            "id": "a2cca466-aa10-48f2-b6d4-0f849830bca8",
+            "name": "Structured Output Parser4"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "d6b6cdeb-42c0-4c67-8ab4-625bbc4dbe3d",
+            "name": "OpenAI Chat Model11",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                6960,
+                2620
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/md2doc.n8n.aemalsayer.com",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "googleDocsOAuth2Api",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "output",
+                            "value": "={{ $json.output.markdown }}"
+                        },
+                        {
+                            "name": "fileName",
+                            "value": "={{ $json.output.title }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                7540,
+                2340
+            ],
+            "id": "4cab4da7-947b-4fa5-812e-9411408d551c",
+            "name": "HTTP Request3",
+            "credentials": {
+                "googleDocsOAuth2Api": {
+                    "id": "DILSL8ij91yK5NZB",
+                    "name": "With Drive API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"title\": \"string (a short, descriptive title for the report)\",\n  \"markdown\": \"string (the full markdown report, using the format above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                7460,
+                2800
+            ],
+            "id": "f4cc3ad7-8adb-48a8-b235-ae47e741f1cd",
+            "name": "Structured Output Parser8"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "id": "dba0aaf6-fae9-4cb6-b962-5898924e4ddb",
+            "name": "OpenAI Chat Model12",
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "position": [
+                6840,
+                1620
+            ],
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const rawItems = $input.all();\n\nconst items = rawItems.filter(item => {\n  const data = item.json.output || item.json;\n  return data && (data.question || data.loop2_search_query || data.loop2_answer || data.loop2_sources);\n});\n\nif (items.length === 0) return [];\n\nlet query = '';\nlet loop2_search_query = '';\nlet allAnswers = [];\nlet allSources = [];\n\n\/\/ Go through each valid item\nfor (let i = 0; i < items.length; i++) {\n  const data = items[i].json.output || items[i].json;\n\n  \/\/ Extract question and search query once\n  if (!query && data.question) {\n    query = data.question;\n  }\n  if (!loop2_search_query && data.loop2_search_query) {\n    loop2_search_query = data.loop2_search_query;\n  }\n\n  \/\/ Append Loop 2 answer\n  if (data.loop2_answer) {\n    allAnswers.push(`### 🧠 Loop 2 Answer:n${data.loop2_answer}`);\n  }\n\n  \/\/ Collect Loop 2 sources\n  if (Array.isArray(data.loop2_sources)) {\n    allSources.push(\n      ...data.loop2_sources.map((src, j) => ({\n        id: allSources.length + j + 1,\n        title: src.title || '',\n        url: src.url || ''\n      }))\n    );\n  }\n}\n\nreturn [{\n  json: {\n    query,\n    loop2_search_query,\n    answer: allAnswers.join('nn'),\n    sources: allSources\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                6520,
+                1400
+            ],
+            "id": "4f852347-15ca-4a26-b7fc-4295f69d06c6",
+            "name": "Prepare Final Report Input1"
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"title\": \"string (short descriptive title for the report)\",\n  \"markdown\": \"string (complete report in Markdown using the structure above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                7260,
+                1860
+            ],
+            "id": "06355ebc-9992-47c9-866e-d6d815deb1cd",
+            "name": "Structured Output Parser9"
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"question\": \"Paste full user query with Follow-up Questions and Answers\",\n  \"search_query\": \"Paste the search query used\",\n  \"answer\": \"Your synthesized answer using inline citations like [1], [2]\",\n  \"sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/example.com\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Title of Source 2\",\n      \"url\": \"https:\/\/example2.com\"\n    }\n  ]\n}\n"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                3500,
+                360
+            ],
+            "id": "bfe730ea-26d2-4753-bc26-5d37fa3e3320",
+            "name": "Structured Output Parser"
+        },
+        {
+            "parameters": {
+                "jsonSchemaExample": "{\n  \"question\": \"Paste full user query here\",\n  \"loop3_search_query\": \"Paste the search query used\",\n  \"loop3_answer\": \"Final answer based on content, using inline citations like [1], [3]\",\n  \"loop3_sources\": [\n    {\n      \"id\": 1,\n      \"title\": \"Title of Source 1\",\n      \"url\": \"https:\/\/source1.com\"\n    }\n  ]\n}\n"
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserStructured",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                5260,
+                2540
+            ],
+            "id": "5fdb7e8b-2bb9-4d7d-bb8b-22e43c37247d",
+            "name": "Structured Output Parser7"
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all();\n\nlet result = {\n  question: '',\n  search_query: '',\n  answer: '',\n  sources: [],\n  loop2_search_query: '',\n  loop2_answer: '',\n  loop2_sources: [],\n  loop3_search_query: '',\n  loop3_answer: '',\n  loop3_sources: []\n};\n\nfor (const item of items) {\n  const data = item.json;\n\n  if (data.question && data.search_query && data.answer && data.sources) {\n    result.question = data.question;\n    result.search_query = data.search_query;\n    result.answer = data.answer;\n    result.sources = data.sources;\n  }\n\n  if (data.loop2_search_query && data.loop2_answer && data.loop2_sources) {\n    result.loop2_search_query = data.loop2_search_query;\n    result.loop2_answer = data.loop2_answer;\n    result.loop2_sources = data.loop2_sources;\n  }\n\n  if (data.loop3_search_query && data.loop3_answer && data.loop3_sources) {\n    result.loop3_search_query = data.loop3_search_query;\n    result.loop3_answer = data.loop3_answer;\n    result.loop3_sources = data.loop3_sources;\n  }\n}\n\nreturn [{ json: result }];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                6600,
+                2280
+            ],
+            "id": "6451306d-e410-4924-8c7c-71ce2a0e5208",
+            "name": "Merge Deep Research Answers"
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                3120,
+                940
+            ],
+            "id": "99428a62-e807-44a9-b403-1b5ec96ee61d",
+            "name": "Auto-fixing Output Parser"
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                5060,
+                2300
+            ],
+            "id": "638caa2f-39c8-4626-9053-9edc7f42a3f3",
+            "name": "Auto-fixing Output Parser1"
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                3380,
+                160
+            ],
+            "id": "1d4d9ea3-1c92-4976-8428-6167bbd48acb",
+            "name": "Auto-fixing Output Parser2"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "claude-3-7-sonnet-20250219",
+                    "cachedResultName": "Claude 3.7 Sonnet"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.3000000000000000444089209850062616169452667236328125,
+            "position": [
+                3300,
+                340
+            ],
+            "id": "cc6c1f6b-39d9-4b1b-b5ed-96e8601174f1",
+            "name": "Anthropic Chat Model",
+            "credentials": {
+                "anthropicApi": {
+                    "id": "uBolrlxPquwRKYTu",
+                    "name": "Anthropic account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "claude-3-7-sonnet-20250219",
+                    "cachedResultName": "Claude 3.7 Sonnet"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.3000000000000000444089209850062616169452667236328125,
+            "position": [
+                3060,
+                1120
+            ],
+            "id": "0c2a5e75-d9b8-4d59-af56-6a2d38f21dd7",
+            "name": "Anthropic Chat Model1",
+            "credentials": {
+                "anthropicApi": {
+                    "id": "uBolrlxPquwRKYTu",
+                    "name": "Anthropic account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "claude-3-7-sonnet-20250219",
+                    "cachedResultName": "Claude 3.7 Sonnet"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.3000000000000000444089209850062616169452667236328125,
+            "position": [
+                5040,
+                2500
+            ],
+            "id": "967a129e-921b-4011-b445-8c181c328af3",
+            "name": "Anthropic Chat Model2",
+            "credentials": {
+                "anthropicApi": {
+                    "id": "uBolrlxPquwRKYTu",
+                    "name": "Anthropic account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                7160,
+                600
+            ],
+            "id": "b99634eb-ca58-4b79-8574-e7ceb0fba6fb",
+            "name": "Auto-fixing Output Parser3"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                7060,
+                800
+            ],
+            "id": "2492567f-c28f-41bc-b25f-f9569333e967",
+            "name": "OpenAI Chat Model1",
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.100000000000000088817841970012523233890533447265625,
+            "position": [
+                4940,
+                1340
+            ],
+            "id": "418fb9af-eee8-4ca4-84b5-2ea7ca1ce0e8",
+            "name": "Merge1"
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.100000000000000088817841970012523233890533447265625,
+            "position": [
+                6160,
+                2220
+            ],
+            "id": "bb693ac2-f09e-4dd0-be90-71b9d83c0e5d",
+            "name": "Merge2"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $json.output || $json;\n\nreturn [{\n  json: {\n    question: data.question || '',\n    loop3_search_query: data.loop3_search_query || '',\n    loop3_answer: data.loop3_answer || '',\n    loop3_sources: data.loop3_sources || []\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                5660,
+                2200
+            ],
+            "id": "a78a88f0-bbda-4bd4-b365-53b98612de97",
+            "name": "Loop3_Prepare Evaluation Input"
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                7200,
+                2560
+            ],
+            "id": "01af1c51-0218-4bb1-b878-5a75b422aa24",
+            "name": "Auto-fixing Output Parser4"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "chatgpt-4o-latest",
+                    "mode": "list",
+                    "cachedResultName": "chatgpt-4o-latest"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.1999999999999999555910790149937383830547332763671875,
+            "position": [
+                7160,
+                2800
+            ],
+            "id": "3f6dd98c-7931-4d16-ba2c-35bb7f607275",
+            "name": "OpenAI Chat Model13",
+            "credentials": {
+                "openAiApi": {
+                    "id": "brwCKFXC41iqw04n",
+                    "name": "OpenAi account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.outputParserAutofixing",
+            "typeVersion": 1,
+            "position": [
+                7120,
+                1620
+            ],
+            "id": "7924fdc6-02d9-49ec-9c90-a82ae3b6679d",
+            "name": "Auto-fixing Output Parser5"
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "claude-3-7-sonnet-20250219",
+                    "cachedResultName": "Claude 3.7 Sonnet"
+                },
+                "options": []
+            },
+            "type": "@n8n\/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.3000000000000000444089209850062616169452667236328125,
+            "position": [
+                7040,
+                1840
+            ],
+            "id": "ef4255f4-ed3d-45b4-b450-1ad1015dc593",
+            "name": "Anthropic Chat Model3",
+            "credentials": {
+                "anthropicApi": {
+                    "id": "uBolrlxPquwRKYTu",
+                    "name": "Anthropic account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const rawItems = $input.all();\nconst items = rawItems.filter(item => {\n  const data = item.json.output || item.json;\n  return data && (data.answer || data.loop2_answer || data.loop3_answer || data.sources || data.question);\n});\n\nif (items.length === 0) return [];\n\nlet allSources = [];\nlet allAnswers = [];\nlet query = '';\n\nfor (let i = 0; i < items.length; i++) {\n  const data = items[i].json.output || item.json;\n\n  if (!query && data.question) {\n    query = data.question;\n  }\n\n  \/\/ Append answers from each loop with labels\n  if (data.answer) {\n    allAnswers.push(`### Loop 1 Answer:n${data.answer}`);\n  }\n\n  if (data.loop2_answer) {\n    allAnswers.push(`### Loop 2 Answer:n${data.loop2_answer}`);\n  }\n\n  if (data.loop3_answer) {\n    allAnswers.push(`### Loop 3 Answer:n${data.loop3_answer}`);\n  }\n\n  \/\/ Combine all sources\n  if (Array.isArray(data.sources)) {\n    allSources.push(\n      ...data.sources.map((src, j) => ({\n        id: allSources.length + j + 1,\n        title: src.title || '',\n        url: src.url || ''\n      }))\n    );\n  }\n}\n\nreturn [{\n  json: {\n    query,\n    answer: allAnswers.join('nn'),\n    sources: allSources\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                6580,
+                380
+            ],
+            "id": "a9769415-b628-4d28-9a7f-e4d899b418fe",
+            "name": "Prepare Final Report"
+        },
+        {
+            "parameters": {
+                "errorMessage": "=Success"
+            },
+            "type": "n8n-nodes-base.stopAndError",
+            "typeVersion": 1,
+            "position": [
+                7760,
+                2340
+            ],
+            "id": "b212c00a-54e6-4306-9c1a-3693d9c2a196",
+            "name": "Done"
+        },
+        {
+            "parameters": {
+                "errorMessage": "Success"
+            },
+            "type": "n8n-nodes-base.stopAndError",
+            "typeVersion": 1,
+            "position": [
+                7700,
+                1400
+            ],
+            "id": "a0614f4d-adcf-4c96-a87e-dfb678025f33",
+            "name": "Done1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/md2doc.n8n.aemalsayer.com",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "googleDocsOAuth2Api",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "output",
+                            "value": "={{ $json.output.markdown }}"
+                        },
+                        {
+                            "name": "fileName",
+                            "value": "={{ $json.output.title }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                7420,
+                380
+            ],
+            "id": "274e34ac-01b9-4460-a6db-02b3bc8a31ed",
+            "name": "HTTP Request1",
+            "credentials": {
+                "googleDocsOAuth2Api": {
+                    "id": "DILSL8ij91yK5NZB",
+                    "name": "With Drive API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/md2doc.n8n.aemalsayer.com",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "googleDocsOAuth2Api",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "output",
+                            "value": "={{ $json.output.markdown }}"
+                        },
+                        {
+                            "name": "fileName",
+                            "value": "={{ $json.output.title }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                7480,
+                1400
+            ],
+            "id": "2941c2dc-7a41-4100-9468-713cf1d695ea",
+            "name": "HTTP Request2",
+            "credentials": {
+                "googleDocsOAuth2Api": {
+                    "id": "DILSL8ij91yK5NZB",
+                    "name": "With Drive API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a 🎯 senior AI research analyst tasked with writing a structured, technically actionable research report based on three iterative research passes.\n\nEach pass builds on the previous one and includes clarification or deeper exploration. Use only the content provided — do **not hallucinate** or invent any new facts.\n\n---\n\n### ❓ User Query (with follow-up answers):\n{{ $json.question }}\n\n---\n\n### 🧠 Research Pass 1 (Initial Synthesis):\n{{ $json.answer }}\n\n---\n\n### 🔎 Research Pass 2 (Clarification-Based Analysis):\n{{ $json.loop2_answer }}\n\n---\n\n### 📈 Research Pass 3 (Deep-Dive Insights):\n{{ $json.loop3_answer }}\n\n---\n\n### 📚 References:\n{{\n[].concat(\n  $json.sources || [],\n  $json.loop2_sources || [],\n  $json.loop3_sources || []\n).map(function(s, i) {\n  return '- [' + (i + 1) + '] ' + s.url;\n}).join('n')\n}}\n\n---\n\n### 📝 Report Instructions:\n\nWrite a complete technical report using **valid Markdown format** only. Use the following structure and guidelines:\n\n---\n\n- `# 📘 Deep Research Report: \"Short descriptive title based on the user's clarified goal\"`\n\n- `## Final Answer Summary`  \n  - State clearly whether the user's request has been fully answered.  \n  - If **yes**, summarize how all constraints were addressed.  \n  - If **no**, explain what's missing and offer the best approximations found.\n\n- `## Clarified User Intent`  \n  - Bullet list of clarified goals or constraints derived from follow-up questions (e.g., “No 3rd party APIs”, “must run locally”, “needs 9:16 framing”)\n\n- `## Tools & Techniques Recommended`  \n  - List relevant open-source tools, commands, frameworks, or nodes  \n  - Format: `**Tool** — purpose [n]`\n\n- `## Step-by-Step Workflow Design`  \n  - Break down the proposed automation into numbered steps  \n  - Describe how tools are chained together  \n  - Include FFmpeg commands, bash script examples, or node usage where helpful  \n  - Mention any special setup instructions (e.g., Docker, GPU requirements)\n\n- `## Challenges & Workarounds`  \n  - List any implementation limitations, tool trade-offs, or assumptions  \n  - Be transparent about what was not fully addressed and why\n\n- `## Final Recommendation`  \n  - 1–2 paragraphs summarizing the best path forward, including starting points and optional extensions\n\n- `## References`  \n  - Numbered links that match all inline `[n]` citations above.\n\n---\n\n✅ Output Format (strict JSON):\n\n```json\n{\n  \"title\": \"string (a short, descriptive title for the report)\",\n  \"markdown\": \"string (the full markdown report, using the format above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}\n\n❌ Do NOT include backticks, markdown fences, or code blocks.\n❌ Do NOT fabricate any data not present in the 3 passes.\n✅ DO use inline [n] citation format and match those to the final numbered list in references.",
+                "hasOutputParser": true
+            },
+            "id": "067f9a24-c3b4-4cd0-be8b-82f8e75a8c95",
+            "name": "Final Report Generator2",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                7040,
+                2340
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": false,
+            "retryOnFail": true,
+            "waitBetweenTries": 5000
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a 🎯 senior AI research analyst tasked with writing a comprehensive, clear, and technically actionable research report based solely on the findings from one research pass.\n\nUse only the information provided below. Do **not** hallucinate or invent any facts. Structure the report clearly for an experienced user who wants to implement the solution with confidence.\n\n---\n\n### ❓ User Question:\n{{ $json.query }}\n\n---\n\n### 🧠 Synthesized Answer (Pass 2):\n{{ $json.answer }}\n---\n\n### 📚 References:\n{{ ($json.sources || []).map((s, i) => '- [' + (i + 1) + '] ' + s.url).join('n') }}\n\n---\n\n### 📝 Report Instructions:\n\nYou must write a detailed research report using **valid Markdown** format only.\n\nYour report should include these sections, with structured formatting and inline citations in `[n]` format:\n\n- `# 📘 Deep Research Report: \"Short Descriptive Title\"`\n- `## Introduction` — Briefly restate the user's query and context\n- `## Key Goals` — List 2–4 bullet points summarizing user needs\n- `## Technical Insights` — Provide a synthesized answer based on Pass 2, citing sources\n- `## Recommended Tools & Approaches` — Bullet out specific tools, APIs, frameworks or methods mentioned, citing sources inline\n- `## Implementation Guidance` — Offer step-by-step instructions (or architecture outline) using bullet points or numbered lists\n- `## Conclusion` — Provide a short summary and recommendation for how the user should proceed\n- `## References` — A list of links numbered in `[n]` format (do not repeat titles)\n\n---\n\n✅ Output Format:\n\nReturn a **single valid JSON object** in the following structure:\n\n```json\n{\n  \"title\": \"string (short descriptive title for the report)\",\n  \"markdown\": \"string (complete report in Markdown using the structure above)\",\n  \"references\": [\"https:\/\/source1.com\", \"https:\/\/source2.com\"]\n}\n\n❌ Do NOT include backticks, explanations, or extra commentary before or after.\n❌ Do NOT hallucinate facts.",
+                "hasOutputParser": true
+            },
+            "id": "2c851e41-ac77-47d3-8a1c-dd305d7c5c47",
+            "name": "Final Report Generator1",
+            "type": "@n8n\/n8n-nodes-langchain.chainLlm",
+            "position": [
+                6980,
+                1400
+            ],
+            "typeVersion": 1.5,
+            "executeOnce": false
+        }
+    ],
+    "pinData": {
+        "Start": [
+            {
+                "json": {
+                    "submittedAt": "2025-05-30T12:28:01.256+05:30",
+                    "formMode": "test"
+                }
+            }
+        ]
+    },
+    "connections": {
+        "Structured Output Parser1": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Clarifying Questions",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Feedback to Items": {
+            "main": [
+                [
+                    {
+                        "node": "For Each Question...",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ask Clarity Questions": {
+            "main": [
+                [
+                    {
+                        "node": "For Each Question...",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "For Each Question...": {
+            "main": [
+                [
+                    {
+                        "node": "Get Initial Query",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Ask Clarity Questions",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Clarifying Questions": {
+            "main": [
+                [
+                    {
+                        "node": "Clarification Needed?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Research Request": {
+            "main": [
+                [
+                    {
+                        "node": "Clarifying Questions",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Initial Query": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "End Form",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Loop2_Merge1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Loop3_Merge2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Clarifying Questions",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Tavily Search": {
+            "main": [
+                [
+                    {
+                        "node": "Format Tavily Results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "End Form": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare GPT-4.1 Input",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Clarification Needed?": {
+            "main": [
+                [
+                    {
+                        "node": "Get Initial Query",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Feedback to Items",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Keywords (Code)": {
+            "main": [
+                [
+                    {
+                        "node": "Tavily Search",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser2": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "LLM Relevance Filter",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "LLM Relevance Filter",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge": {
+            "main": [
+                [
+                    {
+                        "node": "Build Relevance Filter Input",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "LLM Relevance Filter": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Sources for Content Extraction",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model5": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Final Report Generator",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Set Query from Form": {
+            "main": [
+                [
+                    {
+                        "node": "Research Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Start": {
+            "main": [
+                [
+                    {
+                        "node": "Set Query from Form",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Filter Relevant Content per Page",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter Relevant Content per Page": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Evaluation Input",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Prepare Final Report",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Build Relevance Filter Input": {
+            "main": [
+                [
+                    {
+                        "node": "LLM Relevance Filter",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Sources for Content Extraction": {
+            "main": [
+                [
+                    {
+                        "node": "Filter Relevant Content per Page",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare GPT-4.1 Input": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Keywords (Code)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format Tavily Results": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model4": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Evaluate Answer Completeness",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Evaluation Input": {
+            "main": [
+                [
+                    {
+                        "node": "Evaluate Answer Completeness",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Evaluate Answer Completeness": {
+            "main": [
+                [
+                    {
+                        "node": "Parse LLM Output to JSON",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Check If Query Fully Answered": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Final Report",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Loop2_Tavily Search1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse LLM Output to JSON": {
+            "main": [
+                [
+                    {
+                        "node": "Check If Query Fully Answered",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser3": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Loop2_LLM Relevance Filter1",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model6": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Loop2_LLM Relevance Filter1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model7": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Loop2_Filter Relevant Content per Page1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser5": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model8": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Loop2_Evaluate Answer Completeness1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser6": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Loop3_LLM Relevance Filter2",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model9": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Loop3_LLM Relevance Filter2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model10": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Loop3_Filter Relevant Content per Page2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Tavily Search1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Format Tavily Results1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Format Tavily Results1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Merge1",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Loop2_Merge1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Build Relevance Filter Input1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Build Relevance Filter Input1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_LLM Relevance Filter1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_LLM Relevance Filter1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Prepare Sources for Content Extraction1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Prepare Sources for Content Extraction1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Filter Relevant Content per Page1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Filter Relevant Content per Page1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Prepare Evaluation Input1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Prepare Evaluation Input1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Evaluate Answer Completeness1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 1
+                    },
+                    {
+                        "node": "Prepare Final Report Input1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Evaluate Answer Completeness1": {
+            "main": [
+                [
+                    {
+                        "node": "Loop2_Parse LLM Output to JSON1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Check Loop2 Answered": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Final Report Input1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Loop3_Tavily Search2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop2_Parse LLM Output to JSON1": {
+            "main": [
+                [
+                    {
+                        "node": "Check Loop2 Answered",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Tavily Search2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Format Tavily Results2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Format Tavily Results2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Merge2",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Loop3_Merge2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Build Relevance Filter Input2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Build Relevance Filter Input2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_LLM Relevance Filter2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_LLM Relevance Filter2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Prepare Sources for Content Extraction2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Prepare Sources for Content Extraction2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Filter Relevant Content per Page2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Filter Relevant Content per Page2": {
+            "main": [
+                [
+                    {
+                        "node": "Loop3_Prepare Evaluation Input",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Final Report Generator": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser4": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser3",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model11": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Final Report Generator2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser8": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser4",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model12": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Final Report Generator1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Final Report Input1": {
+            "main": [
+                [
+                    {
+                        "node": "Final Report Generator1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser9": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser5",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser2",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Structured Output Parser7": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser1",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Deep Research Answers": {
+            "main": [
+                [
+                    {
+                        "node": "Final Report Generator2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Loop2_Filter Relevant Content per Page1",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser1": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Loop3_Filter Relevant Content per Page2",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser2": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Filter Relevant Content per Page",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Anthropic Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Anthropic Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Anthropic Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser3": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Final Report Generator",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser3",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge2": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Deep Research Answers",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop3_Prepare Evaluation Input": {
+            "main": [
+                [
+                    {
+                        "node": "Merge2",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser4": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Final Report Generator2",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat Model13": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser4",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-fixing Output Parser5": {
+            "ai_outputParser": [
+                [
+                    {
+                        "node": "Final Report Generator1",
+                        "type": "ai_outputParser",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Anthropic Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Auto-fixing Output Parser5",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Final Report": {
+            "main": [
+                [
+                    {
+                        "node": "Final Report Generator",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request3": {
+            "main": [
+                [
+                    {
+                        "node": "Done",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request2": {
+            "main": [
+                [
+                    {
+                        "node": "Done1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Final Report Generator2": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Final Report Generator1": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "b2d3457b-d1fe-49c8-9c2a-265bd6552732",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "f3dbcbb59cf9fb190d20ea182e016b8eeb0887ccb4f5cb48441c71c80532b52b"
+    },
+    "id": "k1H0DzuXHvTBXeZ0",
+    "tags": []
+}
