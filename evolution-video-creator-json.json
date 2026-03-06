@@ -1,0 +1,2296 @@
+{
+    "name": "Evolution Video Creator",
+    "nodes": [
+        {
+            "parameters": {
+                "formTitle": "Start & End Frame Tranformation Creator",
+                "formFields": {
+                    "values": [
+                        {
+                            "fieldLabel": "Upload your 1st image",
+                            "fieldType": "file",
+                            "multipleFiles": false,
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        },
+                        {
+                            "fieldLabel": "Upload your 2nd image",
+                            "fieldType": "file",
+                            "multipleFiles": false,
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        },
+                        {
+                            "fieldLabel": "Upload your 3rd image",
+                            "fieldType": "file",
+                            "multipleFiles": false,
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        },
+                        {
+                            "fieldLabel": "Upload your 4th image",
+                            "fieldType": "file",
+                            "multipleFiles": false,
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        },
+                        {
+                            "fieldLabel": "Upload your 5th image",
+                            "fieldType": "file",
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        },
+                        {
+                            "fieldLabel": "Upload your 6th image",
+                            "fieldType": "file",
+                            "acceptFileTypes": ".jpg, .png, .jpeg, .webp",
+                            "requiredField": true
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.formTrigger",
+            "typeVersion": 2.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -2144,
+                384
+            ],
+            "id": "a2dc2085-e315-4903-bce2-1ed0a61fe667",
+            "name": "On form submission",
+            "webhookId": "f719e841-526e-4d1e-8fd9-082a9694fd69"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                -864,
+                32
+            ],
+            "id": "72ba7924-37c9-4308-b777-5707b7edabc3",
+            "name": "Aggregate"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -256,
+                -32
+            ],
+            "id": "842eaa7f-b5d8-4659-af96-11894d048dec",
+            "name": "checkStatus"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/outputs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                128,
+                0
+            ],
+            "id": "b7c61ac8-1a62-4f48-b446-81b24f557b9a",
+            "name": "getOutput"
+        },
+        {
+            "parameters": [],
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1024,
+                32
+            ],
+            "id": "d93f7881-98fc-47df-b690-87c24225e514",
+            "name": "Merge"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "9c5e12a7-674e-46d2-9569-fd28fb00c35c",
+                            "name": "runninghub_api",
+                            "value": "Enter your API key",
+                            "type": "string"
+                        },
+                        {
+                            "id": "3bd84626-8857-4336-94e1-15c08fa01dd0",
+                            "name": "FALAI_API_KEY",
+                            "value": "Enter your API key",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.399999999999999911182158029987476766109466552734375,
+            "position": [
+                -1888,
+                464
+            ],
+            "id": "18fe41b0-243a-48f9-b344-f446141d0073",
+            "name": "API Setup"
+        },
+        {
+            "parameters": {
+                "jsCode": "return{\n  json: {},\n  binary: $('On form submission').item.binary\n}"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -1888,
+                304
+            ],
+            "id": "7dc09fa9-51f1-4d16-9e2f-5b1a9f8245b0",
+            "name": "getBinaryFile"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_2nd_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1216,
+                32
+            ],
+            "id": "6d97b4df-78af-407f-b572-9140b6057f59",
+            "name": "Upload 2nd Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_1st_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1424,
+                32
+            ],
+            "id": "8f1b5cee-67d4-40ff-a819-51d99da4c068",
+            "name": "Upload 1st Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/ai-app\/run",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"webappId\": \"1935261777502601217\",\n  \"apiKey\": \"{{ $('Merge1').item.json.runninghub_api }}\",\n  \"nodeInfoList\": [\n    {\n      \"nodeId\": \"64\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[0].data.fileName }}\",\n      \"description\": \"First frame\"\n    },\n    {\n      \"nodeId\": \"112\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[1].data.fileName }}\",\n      \"description\": \"Final frame\"\n    },\n    {\n      \"nodeId\": \"304\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"1\",\n      \"description\": \"0 is landscape, 1 is portrait.\"\n    },\n    {\n      \"nodeId\": \"307\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"2\",\n      \"description\": \"Video duration\/seconds\"\n    }\n  ]\n}",
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -688,
+                -16
+            ],
+            "id": "4b2db673-eb7f-44e5-9be5-8283f93440b0",
+            "name": "HTTP Request"
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineByPosition",
+                "options": []
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1632,
+                384
+            ],
+            "id": "63bae624-1907-4666-8570-46533f011597",
+            "name": "Merge1"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                -864,
+                208
+            ],
+            "id": "c0a31a15-1b31-494a-a1b9-190da21de6be",
+            "name": "Aggregate1"
+        },
+        {
+            "parameters": [],
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1024,
+                208
+            ],
+            "id": "ad552ff9-b7d6-43c1-9d93-9f4e33c03419",
+            "name": "Merge2"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                -864,
+                384
+            ],
+            "id": "e252562e-23de-4380-8cc4-dda45d32f33f",
+            "name": "Aggregate2"
+        },
+        {
+            "parameters": [],
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1024,
+                384
+            ],
+            "id": "1f75ca2d-9f88-46a2-8617-b61a6926b134",
+            "name": "Merge3"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                -864,
+                560
+            ],
+            "id": "72e59966-a823-4484-b512-48a20e70a155",
+            "name": "Aggregate3"
+        },
+        {
+            "parameters": [],
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1024,
+                560
+            ],
+            "id": "f68f9385-0274-41b0-abef-3de749bc25cf",
+            "name": "Merge4"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                -864,
+                736
+            ],
+            "id": "d79dfd01-9ef8-4e01-b8f2-23bb72c12a63",
+            "name": "Aggregate4"
+        },
+        {
+            "parameters": [],
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1024,
+                736
+            ],
+            "id": "6f06ee92-9504-4fbf-81df-8e9cabf8fa82",
+            "name": "Merge5"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_2nd_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1424,
+                208
+            ],
+            "id": "f0a1f4b3-6b8b-4078-b48a-eb44f3371318",
+            "name": "Upload 2nd Image -1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_3rd_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1216,
+                208
+            ],
+            "id": "04f3175e-a107-4ed7-97d2-3a1063b56f50",
+            "name": "Upload 3rd Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_3rd_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1424,
+                384
+            ],
+            "id": "a8cd4e7b-0f0d-4d52-861e-044b20ef6b85",
+            "name": "Upload 3rd Image -1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_4th_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1216,
+                384
+            ],
+            "id": "458ce63f-2247-4602-817a-c064ceebef28",
+            "name": "Upload 4th Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_4th_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1424,
+                560
+            ],
+            "id": "f84ee2bf-8c55-4869-a79a-32b86f0a9bab",
+            "name": "Upload 4th Image - 1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_5th_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1216,
+                560
+            ],
+            "id": "28213a02-075b-4cd8-a9c7-b36e20d11fb3",
+            "name": "Upload 5th Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_5th_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1424,
+                736
+            ],
+            "id": "20c33bc2-a46a-4f9f-b151-bc5203641979",
+            "name": "Upload 5th Image - 1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/upload",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "file",
+                            "inputDataFieldName": "Upload_your_6th_image"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -1216,
+                736
+            ],
+            "id": "2ea77d2f-81ef-487f-a4ca-15b2ae0f372e",
+            "name": "Upload 6th Image"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request1').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -256,
+                176
+            ],
+            "id": "5afa8c35-8f45-41dd-939a-b431cf52f9ac",
+            "name": "checkStatus1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/outputs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request1').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                128,
+                208
+            ],
+            "id": "e8c7dfc5-3696-4873-8c10-049eb409dcec",
+            "name": "getOutput1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/ai-app\/run",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"webappId\": \"1935261777502601217\",\n  \"apiKey\": \"{{ $('Merge1').item.json.runninghub_api }}\",\n  \"nodeInfoList\": [\n    {\n      \"nodeId\": \"64\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[0].data.fileName }}\",\n      \"description\": \"First frame\"\n    },\n    {\n      \"nodeId\": \"112\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[1].data.fileName }}\",\n      \"description\": \"Final frame\"\n    },\n    {\n      \"nodeId\": \"304\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"1\",\n      \"description\": \"0 is landscape, 1 is portrait.\"\n    },\n    {\n      \"nodeId\": \"307\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"2\",\n      \"description\": \"Video duration\/seconds\"\n    }\n  ]\n}",
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -688,
+                176
+            ],
+            "id": "4dd0aae0-8f0e-41ea-932e-5c5d6e84a967",
+            "name": "HTTP Request1"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request2').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -256,
+                384
+            ],
+            "id": "9611e04d-5fa5-45bd-a524-32dfe3ad8a6a",
+            "name": "checkStatus2"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/outputs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request2').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                128,
+                416
+            ],
+            "id": "21d94e0f-d1d7-4fa7-9dd1-d7282bcc5a7e",
+            "name": "getOutput2"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/ai-app\/run",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"webappId\": \"1935261777502601217\",\n  \"apiKey\": \"{{ $('Merge1').item.json.runninghub_api }}\",\n  \"nodeInfoList\": [\n    {\n      \"nodeId\": \"64\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[0].data.fileName }}\",\n      \"description\": \"First frame\"\n    },\n    {\n      \"nodeId\": \"112\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[1].data.fileName }}\",\n      \"description\": \"Final frame\"\n    },\n    {\n      \"nodeId\": \"304\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"1\",\n      \"description\": \"0 is landscape, 1 is portrait.\"\n    },\n    {\n      \"nodeId\": \"307\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"2\",\n      \"description\": \"Video duration\/seconds\"\n    }\n  ]\n}",
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -688,
+                384
+            ],
+            "id": "447337cb-3c50-4e90-a01b-33ea62953e5a",
+            "name": "HTTP Request2"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request3').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -256,
+                592
+            ],
+            "id": "1a8da113-7772-4ce2-8843-0a7c18e9e588",
+            "name": "checkStatus3"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/outputs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request3').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                128,
+                624
+            ],
+            "id": "041b6dcb-6689-4afd-b452-770626de11b6",
+            "name": "getOutput3"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/ai-app\/run",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"webappId\": \"1935261777502601217\",\n  \"apiKey\": \"{{ $('Merge1').item.json.runninghub_api }}\",\n  \"nodeInfoList\": [\n    {\n      \"nodeId\": \"64\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[0].data.fileName }}\",\n      \"description\": \"First frame\"\n    },\n    {\n      \"nodeId\": \"112\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[1].data.fileName }}\",\n      \"description\": \"Final frame\"\n    },\n    {\n      \"nodeId\": \"304\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"1\",\n      \"description\": \"0 is landscape, 1 is portrait.\"\n    },\n    {\n      \"nodeId\": \"307\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"2\",\n      \"description\": \"Video duration\/seconds\"\n    }\n  ]\n}",
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -688,
+                592
+            ],
+            "id": "d2825fa8-ba6a-42a9-a36f-c976e7f6077c",
+            "name": "HTTP Request3"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('Merge1').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request4').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -256,
+                800
+            ],
+            "id": "e8155312-c799-4ee2-8868-24ff09eedffc",
+            "name": "checkStatus4"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/outputs",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "apiKey",
+                            "value": "={{ $('API Setup').item.json.runninghub_api }}"
+                        },
+                        {
+                            "name": "taskId",
+                            "value": "={{ $('HTTP Request4').item.json.data.taskId }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                128,
+                832
+            ],
+            "id": "87d80e1d-bb31-46ec-8b36-1dce82238062",
+            "name": "getOutput4"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/www.runninghub.ai\/task\/openapi\/ai-app\/run",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Host",
+                            "value": "www.runninghub.ai"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"webappId\": \"1935261777502601217\",\n  \"apiKey\": \"{{ $('Merge1').item.json.runninghub_api }}\",\n  \"nodeInfoList\": [\n    {\n      \"nodeId\": \"64\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[0].data.fileName }}\",\n      \"description\": \"First frame\"\n    },\n    {\n      \"nodeId\": \"112\",\n      \"fieldName\": \"image\",\n      \"fieldValue\": \"{{ $json.data[1].data.fileName }}\",\n      \"description\": \"Final frame\"\n    },\n    {\n      \"nodeId\": \"304\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"1\",\n      \"description\": \"0 is landscape, 1 is portrait.\"\n    },\n    {\n      \"nodeId\": \"307\",\n      \"fieldName\": \"value\",\n      \"fieldValue\": \"2\",\n      \"description\": \"Video duration\/seconds\"\n    }\n  ]\n}",
+                "options": {
+                    "redirect": {
+                        "redirect": []
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                -688,
+                784
+            ],
+            "id": "4b0cef3f-8e3e-4198-b97f-5982808c8efb",
+            "name": "HTTP Request4"
+        },
+        {
+            "parameters": {
+                "numberInputs": 5
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.20000000000000017763568394002504646778106689453125,
+            "position": [
+                320,
+                368
+            ],
+            "id": "3868d977-64bf-4a57-97e1-b83cfe166e70",
+            "name": "Merge All links"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https:\/\/queue.fal.run\/fal-ai\/ffmpeg-api\/merge-videos",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Key {{ $('Merge1').item.json.FALAI_API_KEY }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"video_urls\": [\n    \"{{ $json.data[0].data[0].fileUrl }}\",\n    \"{{ $json.data[1].data[0].fileUrl }}\",\n    \"{{ $json.data[2].data[0].fileUrl }}\",\n    \"{{ $json.data[3].data[0].fileUrl }}\",\n    \"{{ $json.data[4].data[0].fileUrl }}\"\n  ]\n}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                608,
+                416
+            ],
+            "id": "c6db3544-c363-47cb-915b-82b76c2f7aa6",
+            "name": "Submit merge job"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": []
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                448,
+                416
+            ],
+            "id": "d0554238-9e06-462c-9214-eec7293030a7",
+            "name": "Aggregate5"
+        },
+        {
+            "parameters": {
+                "url": "=https:\/\/queue.fal.run\/fal-ai\/ffmpeg-api\/requests\/{{ $json.request_id }}\/status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Key {{ $('Merge1').item.json.FALAI_API_KEY }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                944,
+                416
+            ],
+            "id": "8c90c8df-c164-4ba3-b53a-37af5f127c82",
+            "name": "Check Status"
+        },
+        {
+            "parameters": {
+                "url": "=https:\/\/queue.fal.run\/fal-ai\/ffmpeg-api\/requests\/{{ $json.request_id }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Key {{ $('Merge1').item.json.FALAI_API_KEY }}"
+                        }
+                    ]
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.29999999999999982236431605997495353221893310546875,
+            "position": [
+                608,
+                608
+            ],
+            "id": "db2c1cf8-dc57-4623-b085-26105ab8d38c",
+            "name": "Get Final Result"
+        },
+        {
+            "parameters": {
+                "url": "={{ $json.video.url }}",
+                "options": []
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.20000000000000017763568394002504646778106689453125,
+            "position": [
+                784,
+                608
+            ],
+            "id": "ef3b5cba-94b7-44bc-b457-20b9b60948c7",
+            "name": "downloadVideo"
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                -448,
+                -32
+            ],
+            "id": "1ddd723b-17ac-4636-b5ef-0b99cd956171",
+            "name": "Wait",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.data }}",
+                            "rightValue": "SUCCESS",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -80,
+                -32
+            ],
+            "id": "3bdf2602-2e2b-4fa4-b485-027645b7b8aa",
+            "name": "If"
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                -448,
+                176
+            ],
+            "id": "25979c43-b1a1-49af-af80-d3389eabd276",
+            "name": "Wait1",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.data }}",
+                            "rightValue": "SUCCESS",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -80,
+                176
+            ],
+            "id": "519bd43b-8759-4a4c-99b1-e5b13775d2c0",
+            "name": "If1"
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                -448,
+                384
+            ],
+            "id": "fcf1b0b3-bd97-40ec-a41a-243862d0f93b",
+            "name": "Wait2",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.data }}",
+                            "rightValue": "SUCCESS",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -80,
+                384
+            ],
+            "id": "2b62a424-5dfa-4942-ac90-620580526716",
+            "name": "If2"
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                -448,
+                592
+            ],
+            "id": "bb3fa6a2-46a0-487e-a2c0-098b8fc6b042",
+            "name": "Wait3",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.data }}",
+                            "rightValue": "SUCCESS",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -80,
+                592
+            ],
+            "id": "0861be48-3fdd-42ff-8eb7-e54145535b3b",
+            "name": "If3"
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "minutes"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                -448,
+                800
+            ],
+            "id": "dbe2f508-87be-4c17-b632-b8a4787914c9",
+            "name": "Wait4",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.data }}",
+                            "rightValue": "SUCCESS",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                -80,
+                800
+            ],
+            "id": "700d13d1-47e8-4b5f-b35f-54ae27b15c8d",
+            "name": "If4"
+        },
+        {
+            "parameters": {
+                "amount": 30
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.100000000000000088817841970012523233890533447265625,
+            "position": [
+                784,
+                416
+            ],
+            "id": "5ea1a41d-a6eb-4159-acfe-57277d208222",
+            "name": "Wait5",
+            "webhookId": "47b6b21f-7d2c-42fd-aa19-c20ad7dc1765"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4ea379e-3541-4d2b-9421-f0c962c8d5e8",
+                            "leftValue": "={{ $json.status }}",
+                            "rightValue": "COMPLETED",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": []
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.20000000000000017763568394002504646778106689453125,
+            "position": [
+                448,
+                624
+            ],
+            "id": "f13437a6-80d4-4b6e-8c35-ca694f95e295",
+            "name": "If5"
+        }
+    ],
+    "pinData": [],
+    "connections": {
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "checkStatus": {
+            "main": [
+                [
+                    {
+                        "node": "If",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getOutput": {
+            "main": [
+                [
+                    {
+                        "node": "Merge All links",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "API Setup": {
+            "main": [
+                [
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "On form submission": {
+            "main": [
+                [
+                    {
+                        "node": "getBinaryFile",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "API Setup",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getBinaryFile": {
+            "main": [
+                [
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 1st Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 2nd Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Merge1": {
+            "main": [
+                [
+                    {
+                        "node": "Upload 1st Image",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 2nd Image",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 2nd Image -1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 3rd Image",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 3rd Image -1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 4th Image",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 4th Image - 1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 5th Image",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 5th Image - 1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Upload 6th Image",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge2": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge3": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge4": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge5": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 2nd Image -1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 3rd Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge2",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Upload 3rd Image -1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 4th Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge3",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Upload 4th Image - 1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 5th Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge4",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Upload 5th Image - 1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Upload 6th Image": {
+            "main": [
+                [
+                    {
+                        "node": "Merge5",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "checkStatus1": {
+            "main": [
+                [
+                    {
+                        "node": "If1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getOutput1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge All links",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "HTTP Request1": {
+            "main": [
+                [
+                    {
+                        "node": "Wait1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate1": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "checkStatus2": {
+            "main": [
+                [
+                    {
+                        "node": "If2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getOutput2": {
+            "main": [
+                [
+                    {
+                        "node": "Merge All links",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "HTTP Request2": {
+            "main": [
+                [
+                    {
+                        "node": "Wait2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate2": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "checkStatus3": {
+            "main": [
+                [
+                    {
+                        "node": "If3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getOutput3": {
+            "main": [
+                [
+                    {
+                        "node": "Merge All links",
+                        "type": "main",
+                        "index": 3
+                    }
+                ]
+            ]
+        },
+        "HTTP Request3": {
+            "main": [
+                [
+                    {
+                        "node": "Wait3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate3": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "checkStatus4": {
+            "main": [
+                [
+                    {
+                        "node": "If4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "getOutput4": {
+            "main": [
+                [
+                    {
+                        "node": "Merge All links",
+                        "type": "main",
+                        "index": 4
+                    }
+                ]
+            ]
+        },
+        "HTTP Request4": {
+            "main": [
+                [
+                    {
+                        "node": "Wait4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate4": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge All links": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate5": {
+            "main": [
+                [
+                    {
+                        "node": "Submit merge job",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Submit merge job": {
+            "main": [
+                [
+                    {
+                        "node": "Wait5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Check Status": {
+            "main": [
+                [
+                    {
+                        "node": "If5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Final Result": {
+            "main": [
+                [
+                    {
+                        "node": "downloadVideo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait": {
+            "main": [
+                [
+                    {
+                        "node": "checkStatus",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If": {
+            "main": [
+                [
+                    {
+                        "node": "getOutput",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If1": {
+            "main": [
+                [
+                    {
+                        "node": "getOutput1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait1": {
+            "main": [
+                [
+                    {
+                        "node": "checkStatus1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If2": {
+            "main": [
+                [
+                    {
+                        "node": "getOutput2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait2": {
+            "main": [
+                [
+                    {
+                        "node": "checkStatus2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If3": {
+            "main": [
+                [
+                    {
+                        "node": "getOutput3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait3": {
+            "main": [
+                [
+                    {
+                        "node": "checkStatus3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If4": {
+            "main": [
+                [
+                    {
+                        "node": "getOutput4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait4": {
+            "main": [
+                [
+                    {
+                        "node": "checkStatus4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If5": {
+            "main": [
+                [
+                    {
+                        "node": "Get Final Result",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Wait5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait5": {
+            "main": [
+                [
+                    {
+                        "node": "Check Status",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "a62f067c-2bde-49e1-b022-ca4fd06d903c",
+    "meta": {
+        "instanceId": "aa09a75fa004ce44a1977a9690067500d2c01dfe09723faeb62d7a3f986b6cd8"
+    },
+    "id": "qtgyekj9mvbZwKbk",
+    "tags": [
+        {
+            "updatedAt": "2025-11-27T03:59:01.801Z",
+            "createdAt": "2025-11-27T03:59:01.801Z",
+            "id": "ar995C6avFM4GduL",
+            "name": "Template"
+        }
+    ]
+}
