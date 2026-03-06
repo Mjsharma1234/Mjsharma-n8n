@@ -1,0 +1,740 @@
+{
+  "name": "PROJECT CODEX: AI Historian Suite v3.0",
+  "description": "Tony Stark Edition - Multi-input, multi-agent AI book generator with voice, image, and timeline inputs",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message", "voice", "photo"],
+        "additionalFields": []
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [80, 144],
+      "id": "telegram-trigger",
+      "name": "Telegram Input Gateway"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.2,
+      "position": [80, 320],
+      "id": "webhook-input",
+      "name": "Web/Discord Input",
+      "webhookId": "codex-webhook-v2"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const { source, data } = input.json;\n  \n  const inputHandlers = {\n    telegram: (d) => ({\n      text: d.message?.text || d.message?.caption || '',\n      source: 'telegram',\n      chatId: d.message?.chat.id,\n      userId: d.message?.from.id,\n      hasImage: !!d.message?.photo,\n      hasVoice: !!d.message?.voice,\n      raw: d\n    }),\n    \n    discord: (d) => ({\n      text: d.content || '',\n      source: 'discord',\n      channelId: d.channel_id,\n      userId: d.author.id,\n      attachments: d.attachments || [],\n      raw: d\n    }),\n    \n    web: (d) => ({\n      text: d.query || d.text || '',\n      source: 'web',\n      sessionId: d.sessionId || `web_${Date.now()}`,\n      timelineData: d.timelinePoints || [],\n      voiceTranscript: d.voiceTranscript || null,\n      customStyle: d.style || 'professional',\n      raw: d\n    })\n  };\n  \n  const handler = inputHandlers[source] || inputHandlers.telegram;\n  const processed = handler(data || input.json);\n  \n  // Language detection\n  const langPatterns = {\n    spanish: /\\b(el|la|y|es|que|por)\\b/gi,\n    french: /\\b(le|la|et|est|dans|pour)\\b/gi,\n    german: /\\b(der|die|das|und|ist|für)\\b/gi,\n    italian: /\\b(il|la|e|è|per|con)\\b/gi\n  };\n  \n  let detectedLang = 'english';\n  for (const [lang, pattern] of Object.entries(langPatterns)) {\n    if (processed.text.match(pattern)?.length > 2) {\n      detectedLang = lang;\n      break;\n    }\n  }\n  \n  // Complexity analysis\n  const wordCount = processed.text.split(/\\s+/).length;\n  const hasDates = /\\d{4}|\\b(century|BC|AD)\\b/i.test(processed.text);\n  const hasNames = /\\b([A-Z][a-z]+\\s+[A-Z][a-z]+)\\b/.test(processed.text);\n  \n  const complexity = wordCount > 50 ? 'high' : \n                     hasDates && hasNames ? 'medium' : 'low';\n  \n  return {\n    ...processed,\n    metadata: {\n      timestamp: new Date().toISOString(),\n      requestId: `codex_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,\n      processingTier: complexity === 'high' ? 'premium' : 'standard',\n      language: detectedLang,\n      complexity: complexity,\n      estimatedChapters: complexity === 'high' ? 15 : \n                        complexity === 'medium' ? 10 : 5\n    }\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 240],
+      "id": "input-processor",
+      "name": "Multi-Input Processor"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are CODEX, the ultimate history topic classifier and enhancer.\n\n### CAPABILITIES:\n1. Detect if topic is historical, educational, biographical, or scientific\n2. Handle inputs in English, Spanish, French, German, Italian\n3. Recognize image/voice context from metadata\n4. If valid: enhance topic (e.g., 'napoleon' → 'Napoleon Bonaparte: Rise and Fall of the French Empire')\n5. If invalid: provide helpful redirection\n6. Suggest visualization styles based on topic\n\n### OUTPUT FORMAT:\n{\n  \"is_valid\": boolean,\n  \"refined_topic\": string,\n  \"reply_to_user\": string,\n  \"suggested_style\": \"cinematic\"|\"documentary\"|\"painting\"|\"infographic\",\n  \"language\": \"en\"|\"es\"|\"fr\"|\"de\"|\"it\",\n  \"estimated_difficulty\": \"beginner\"|\"intermediate\"|\"advanced\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [560, 240],
+      "id": "topic-enhancer",
+      "name": "CODEX Topic Enhancer"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"is_valid\": true, \"refined_topic\": \"The Space Race: USA vs USSR 1955-1972\", \"reply_to_user\": \"\", \"suggested_style\": \"cinematic\", \"language\": \"en\", \"estimated_difficulty\": \"intermediate\"}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [720, 320],
+      "id": "enhancer-parser",
+      "name": "Enhancer Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const { is_valid, refined_topic, metadata } = input.json;\n  \n  if (!is_valid) {\n    return {\n      abort: true,\n      message: input.json.reply_to_user || \"Topic not valid for history book generation.\"\n    };\n  }\n  \n  // Generate unique IDs\n  const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;\n  const batchId = `batch_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;\n  \n  // Determine research depth\n  const complexity = metadata?.complexity || 'medium';\n  const researchAgents = {\n    low: ['timeline_basic'],\n    medium: ['timeline_detailed', 'key_figures'],\n    high: ['timeline_detailed', 'key_figures', 'cultural_context', 'primary_sources']\n  }[complexity];\n  \n  return {\n    jobData: {\n      id: jobId,\n      batchId: batchId,\n      topic: refined_topic,\n      originalText: input.json.text,\n      source: input.json.source,\n      metadata: metadata,\n      style: input.json.suggested_style || 'documentary',\n      language: input.json.language || 'en',\n      difficulty: input.json.estimated_difficulty || 'intermediate',\n      researchAgents: researchAgents,\n      status: 'research_initiated',\n      createdAt: new Date().toISOString(),\n      estimatedCompletion: new Date(Date.now() + \n        (complexity === 'high' ? 900000 : \n         complexity === 'medium' ? 600000 : 300000)).toISOString()\n    },\n    researchPlan: {\n      topic: refined_topic,\n      agents: researchAgents.map(agent => ({\n        name: agent,\n        prompt: getAgentPrompt(agent, refined_topic, metadata),\n        model: complexity === 'high' ? 'gpt-4.1-mini' : 'gpt-3.5-turbo',\n        outputFormat: 'json'\n      })),\n      mergeStrategy: 'timeline_first'\n    }\n  };\n};\n\nfunction getAgentPrompt(agent, topic, metadata) {\n  const prompts = {\n    timeline_basic: `Extract 5-10 key dates for: \"${topic}\". Format: {dates: [{year: \"\", event: \"\", importance: \"low|medium|high\"}]}`,\n    timeline_detailed: `Create detailed timeline for: \"${topic}\" with 10-20 events including dates, locations, key people. Return as structured timeline.`,\n    key_figures: `Identify 3-8 key figures in: \"${topic}\". For each: name, role, significance, visual_description.`,\n    cultural_context: `Describe cultural/social context for: \"${topic}\". Include: fashion, technology, daily_life, beliefs.`,\n    primary_sources: `Suggest 3-5 primary sources/quotes for: \"${topic}\". Include: source, quote, context.`\n  };\n  return prompts[agent] || `Research: ${topic}`;\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 240],
+      "id": "job-orchestrator",
+      "name": "Job Orchestrator"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "1DoalR9fh3oGZoxGSlZaTxPy9tJX4SLp4HJxUfdIXO-E",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.jobData.id }}",
+            "Batch ID": "={{ $json.jobData.batchId }}",
+            "Topic": "={{ $json.jobData.topic }}",
+            "Status": "Researching",
+            "Complexity": "={{ $json.jobData.metadata.complexity }}",
+            "Language": "={{ $json.jobData.language }}",
+            "Style": "={{ $json.jobData.style }}",
+            "Created At": "={{ $json.jobData.createdAt }}",
+            "Estimated Complete": "={{ $json.jobData.estimatedCompletion }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1080, 240],
+      "id": "log-research-start",
+      "name": "Log Research Start"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1240, 240],
+      "id": "research-delay",
+      "name": "Research Delay"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.researchPlan.topic }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are CODEX RESEARCH MASTER. Your task: research and synthesize historical topic into structured chapters.\n\n### INPUT:\n- Topic: {{ $json.researchPlan.topic }}\n- Complexity: {{ $json.jobData.metadata.complexity }}\n- Language: {{ $json.jobData.language }}\n- Style: {{ $json.jobData.style }}\n- Target chapters: {{ $json.jobData.metadata.estimatedChapters }}\n\n### PROCESS:\n1. Use web search to verify ALL facts\n2. Break into {{ $json.jobData.metadata.estimatedChapters }} chronological chapters\n3. Each chapter MUST have:\n   - chapter_id: number\n   - title: compelling title in {{ $json.jobData.language }}\n   - date: specific year/date range\n   - content: 3-5 educational sentences\n   - image_prompt: detailed visual description matching {{ $json.jobData.style }} style\n   - key_figures: relevant people mentioned\n   - significance: why this moment matters\n\n### IMAGE PROMPT GUIDELINES:\nStyle: {{ $json.jobData.style }}\nCinematic: dramatic lighting, filmic composition\nDocumentary: authentic, realistic, balanced\nPainting: artistic composition, texture\nInfographic: clear, diagrammatic, labeled\n\n### OUTPUT:\nReturn ONLY JSON array of chapters."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [1400, 240],
+      "id": "research-master",
+      "name": "CODEX Research Master"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5.1",
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "large"
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [1400, 400],
+      "id": "gpt-5-researcher",
+      "name": "GPT-5.1 Researcher"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"chapters\": [{\"chapter_id\": 1, \"title\": \"The Spark\", \"date\": \"1961\", \"content\": \"President Kennedy's famous speech...\", \"image_prompt\": \"Cinematic wide shot of JFK at podium, dramatic backlighting, text '1961' on teleprompter\", \"key_figures\": [\"John F. Kennedy\"], \"significance\": \"Catalyst for the Space Race\"}]}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [1560, 240],
+      "id": "research-parser",
+      "name": "Research Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const chapters = input.json.chapters || [];\n  const jobData = input.json.jobData;\n  \n  // Assign unique IDs to each chapter\n  const enhancedChapters = chapters.map((chapter, index) => ({\n    ...chapter,\n    chapter_uuid: `ch_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 4)}`,\n    job_id: jobData.id,\n    batch_id: jobData.batchId,\n    style: jobData.style,\n    language: jobData.language,\n    image_status: 'pending',\n    image_url: null,\n    image_generation_attempts: 0\n  }));\n  \n  // Log chapter count\n  console.log(`Generated ${enhancedChapters.length} chapters`);\n  \n  return {\n    jobData: jobData,\n    chapters: enhancedChapters,\n    summary: {\n      totalChapters: enhancedChapters.length,\n      dateRange: {\n        start: enhancedChapters[0]?.date,\n        end: enhancedChapters[enhancedChapters.length - 1]?.date\n      },\n      keyFigures: [...new Set(enhancedChapters.flatMap(ch => ch.key_figures))].filter(Boolean),\n      estimatedImageGenerationTime: enhancedChapters.length * 45, // seconds\n      nextStep: 'image_generation'\n    }\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1720, 240],
+      "id": "chapter-processor",
+      "name": "Chapter Processor"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": "1DoalR9fh3oGZoxGSlZaTxPy9tJX4SLp4HJxUfdIXO-E",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.jobData.id }}",
+            "Status": "Generating Images",
+            "Chapters": "={{ $json.summary.totalChapters }}",
+            "Date Range": "={{ $json.summary.dateRange.start }} - {{ $json.summary.dateRange.end }}"
+          },
+          "matchingColumns": ["ID"]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1880, 240],
+      "id": "update-image-gen",
+      "name": "Update Status: Image Gen"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "chapters",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [2040, 240],
+      "id": "split-chapters",
+      "name": "Split Chapters for Processing"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const chapter = input.json;\n  const style = chapter.style || 'documentary';\n  \n  // Style-specific prompt enhancements\n  const styleEnhancers = {\n    cinematic: `Cinematic film still, dramatic lighting, shallow depth of field, 35mm film grain, Academy ratio, `,\n    documentary: `Documentary photography, authentic lighting, realistic details, journalistic style, `,\n    painting: `Oil painting style, visible brush strokes, rich textures, classical composition, `,\n    infographic: `Clear infographic style, labeled elements, flat colors, diagrammatic, educational, `\n  };\n  \n  // Enhance prompt based on style\n  const enhancedPrompt = `${styleEnhancers[style] || ''}${chapter.image_prompt}. ` +\n    `Historical accuracy is crucial. ` +\n    `The text \"${chapter.date}\" should be naturally integrated into the scene. ` +\n    `High resolution, detailed, professional quality.`;\n  \n  // Determine model based on style\n  const model = style === 'cinematic' ? 'nano-banana-pro-premium' : \n                style === 'painting' ? 'nano-banana-pro-art' : \n                'nano-banana-pro';\n  \n  return {\n    ...chapter,\n    enhanced_image_prompt: enhancedPrompt,\n    target_model: model,\n    generation_params: {\n      aspect_ratio: \"16:9\",\n      resolution: style === 'cinematic' ? \"2K\" : \"1K\",\n      style_preset: style,\n      guidance_scale: 7.5,\n      steps: 30\n    },\n    timestamp: new Date().toISOString()\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 240],
+      "id": "prompt-enhancer",
+      "name": "Prompt Enhancer"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{YOUR_NANO_BANANA_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"{{ $json.target_model }}\",\n  \"input\": {\n    \"prompt\": \"{{ $json.enhanced_image_prompt }}\",\n    \"aspect_ratio\": \"{{ $json.generation_params.aspect_ratio }}\",\n    \"resolution\": \"{{ $json.generation_params.resolution }}\",\n    \"output_format\": \"png\",\n    \"style_preset\": \"{{ $json.generation_params.style_preset }}\",\n    \"guidance_scale\": {{ $json.generation_params.guidance_scale }},\n    \"steps\": {{ $json.generation_params.steps }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [2360, 240],
+      "id": "image-generation-api",
+      "name": "Image Generation API"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2520, 240],
+      "id": "api-delay",
+      "name": "API Delay"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{YOUR_NANO_BANANA_API_KEY}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2680, 240],
+      "id": "check-generation-status",
+      "name": "Check Generation Status"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "=generating waiting queuing",
+                    "rightValue": "={{ $json.data.state }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "retry"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "success"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [2840, 240],
+      "id": "image-status-switch",
+      "name": "Image Status Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const item = input.json;\n  \n  // Check if we should retry\n  const attempts = item.image_generation_attempts || 0;\n  \n  if (attempts >= 3) {\n    return {\n      ...item,\n      image_status: 'failed',\n      image_generation_attempts: attempts,\n      error: 'Max retries exceeded'\n    };\n  }\n  \n  // Wait before retry (exponential backoff)\n  const waitTime = Math.min(30 * Math.pow(2, attempts), 300);\n  \n  return {\n    wait: waitTime,\n    retry_item: {\n      ...item,\n      image_generation_attempts: attempts + 1,\n      image_status: 'retrying'\n    }\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3000, 240],
+      "id": "retry-logic",
+      "name": "Retry Logic"
+    },
+    {
+      "parameters": {
+        "url": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [3160, 240],
+      "id": "download-image",
+      "name": "Download Generated Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloudinary.com/v1_1/{{YOUR_CLOUD_NAME}}/image/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "upload_preset",
+              "value": "{{YOUR_UPLOAD_PRESET}}"
+            },
+            {
+              "name": "folder",
+              "value": "codex/history-books/{{ $json.job_id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3320, 240],
+      "id": "upload-to-cloudinary",
+      "name": "Upload to Cloudinary"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const response = input.json;\n  const item = input.item.json;\n  \n  return {\n    ...item,\n    image_status: 'completed',\n    image_url: response.secure_url,\n    image_public_id: response.public_id,\n    image_format: response.format,\n    image_dimensions: `${response.width}x${response.height}`,\n    uploaded_at: new Date().toISOString()\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3480, 240],
+      "id": "update-image-metadata",
+      "name": "Update Image Metadata"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "job_id",
+        "joinMode": "enrichInput2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [3640, 240],
+      "id": "merge-chapters",
+      "name": "Merge Completed Chapters"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const items = input.json;\n  const jobData = items[0]?.jobData || {};\n  \n  // Group by job_id\n  const grouped = {};\n  items.forEach(item => {\n    if (!grouped[item.job_id]) {\n      grouped[item.job_id] = {\n        jobData: item.jobData,\n        chapters: []\n      };\n    }\n    grouped[item.job_id].chapters.push(item);\n  });\n  \n  // Sort chapters by chapter_id\n  Object.values(grouped).forEach(group => {\n    group.chapters.sort((a, b) => a.chapter_id - b.chapter_id);\n  });\n  \n  return Object.values(grouped);\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3800, 240],
+      "id": "aggregate-completed",
+      "name": "Aggregate Completed"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": "1DoalR9fh3oGZoxGSlZaTxPy9tJX4SLp4HJxUfdIXO-E",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.jobData.id }}",
+            "Status": "Generating PDF",
+            "Images Completed": "={{ $json.chapters.filter(c => c.image_status === 'completed').length }}/{{ $json.chapters.length }}",
+            "Last Updated": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": ["ID"]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [3960, 240],
+      "id": "update-pdf-gen",
+      "name": "Update Status: PDF Gen"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const { jobData, chapters } = input.json;\n  const style = jobData.style || 'documentary';\n  const language = jobData.language || 'en';\n  \n  // Get template based on style\n  const templates = {\n    cinematic: getCinematicTemplate,\n    documentary: getDocumentaryTemplate,\n    painting: getArtisticTemplate,\n    infographic: getInfographicTemplate\n  };\n  \n  const templateFunction = templates[style] || getDocumentaryTemplate;\n  const html = templateFunction(jobData, chapters, language);\n  \n  return {\n    ...input.json,\n    html_content: html,\n    template_used: style,\n    page_count: chapters.length,\n    generated_at: new Date().toISOString()\n  };\n};\n\nfunction getCinematicTemplate(jobData, chapters, language) {\n  return `<!DOCTYPE html>\n<html lang=\"${language}\">\n<head>\n<meta charset=\"UTF-8\">\n<title>${jobData.topic}</title>\n<style>\n  /* Cinematic styles */\n  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&display=swap');\n  body { \n    margin: 0; \n    background: #0a0a0a; \n    color: #f0f0f0; \n    font-family: 'Open Sans', sans-serif;\n  }\n  .page { \n    width: 100vw; \n    height: 100vh; \n    position: relative; \n    page-break-after: always;\n    overflow: hidden;\n  }\n  .hero-image {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    object-fit: cover;\n    filter: brightness(0.7) contrast(1.1);\n    z-index: 1;\n  }\n  .content-overlay {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.8) 100%);\n    z-index: 2;\n    padding: 60px;\n    box-sizing: border-box;\n  }\n  h1 {\n    font-family: 'Cinzel', serif;\n    font-size: 3.5em;\n    margin: 0 0 20px 0;\n    text-transform: uppercase;\n    letter-spacing: 2px;\n    color: #ffd700;\n  }\n  .date-badge {\n    font-family: 'Cinzel', serif;\n    font-size: 2.5em;\n    color: #ff6b6b;\n    margin-bottom: 40px;\n    display: inline-block;\n    padding: 5px 15px;\n    border: 2px solid #ff6b6b;\n    border-radius: 3px;\n  }\n  .chapter-content {\n    font-size: 1.2em;\n    line-height: 1.8;\n    max-width: 800px;\n    text-shadow: 0 2px 4px rgba(0,0,0,0.5);\n  }\n  .footer {\n    position: absolute;\n    bottom: 40px;\n    right: 60px;\n    font-size: 0.9em;\n    color: #888;\n    font-family: monospace;\n  }\n</style>\n</head>\n<body>\n  ${chapters.map(chapter => `\n    <div class=\"page\">\n      <img class=\"hero-image\" src=\"${chapter.image_url}\" alt=\"${chapter.title}\">\n      <div class=\"content-overlay\">\n        <h1>${chapter.title}</h1>\n        <div class=\"date-badge\">${chapter.date}</div>\n        <div class=\"chapter-content\">${chapter.content}</div>\n        <div class=\"footer\">\n          ${jobData.topic} • Chapter ${chapter.chapter_id} • CODEX AI\n        </div>\n      </div>\n    </div>\n  `).join('')}\n</body>\n</html>`;\n}\n\nfunction getDocumentaryTemplate(jobData, chapters, language) {\n  // Documentary template (clean, professional)\n  return `<!DOCTYPE html>\n<html lang=\"${language}\">\n<head>\n<meta charset=\"UTF-8\">\n<title>${jobData.topic} - Historical Analysis</title>\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Open+Sans:wght@400;600&display=swap');\n  body { margin: 0; padding: 0; background: #fdfbf7; font-family: 'Open Sans', sans-serif; }\n  .page-container { width: 100%; height: 100vh; padding: 40px; box-sizing: border-box; page-break-after: always; }\n  .header { border-bottom: 2px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px; }\n  h1 { font-family: 'Merriweather', serif; font-size: 32px; color: #2c3e50; margin: 0; }\n  .date-badge { font-size: 28px; color: #c0392b; font-weight: bold; }\n  .visual-asset { width: 100%; height: 300px; margin: 30px 0; border-radius: 4px; overflow: hidden; }\n  .visual-asset img { width: 100%; height: 100%; object-fit: cover; }\n  .content-block { columns: 2; column-gap: 40px; font-size: 15px; line-height: 1.7; }\n  .footer { margin-top: 40px; font-size: 11px; color: #95a5a6; text-align: right; }\n</style>\n</head>\n<body>\n  ${chapters.map(chapter => `\n    <div class=\"page-container\">\n      <div class=\"header\">\n        <h1>${chapter.title}</h1>\n        <div class=\"date-badge\">${chapter.date}</div>\n      </div>\n      <div class=\"visual-asset\">\n        <img src=\"${chapter.image_url}\" alt=\"${chapter.title}\">\n      </div>\n      <div class=\"content-block\">\n        <p>${chapter.content}</p>\n      </div>\n      <div class=\"footer\">\n        ID: ${chapter.chapter_uuid} | ${jobData.topic} | CODEX Historical Engine\n      </div>\n    </div>\n  `).join('')}\n</body>\n</html>`;\n}\n\nfunction getArtisticTemplate(jobData, chapters, language) {\n  // Artistic/painting style template\n  return `<!DOCTYPE html>\n<html lang=\"${language}\">\n<head>\n<meta charset=\"UTF-8\">\n<title>${jobData.topic} - Artistic Rendition</title>\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Crimson+Text:wght@400;600&display=swap');\n  body { margin: 0; padding: 0; background: #f8f1e5; font-family: 'Crimson Text', serif; }\n  .page { width: 100vw; height: 100vh; position: relative; page-break-after: always; }\n  .artwork-frame { position: absolute; top: 50px; left: 50px; right: 50px; bottom: 150px; \n                   border: 15px solid #8B4513; background: #000; overflow: hidden; }\n  .artwork-frame img { width: 100%; height: 100%; object-fit: contain; }\n  .caption-area { position: absolute; bottom: 50px; left: 50px; right: 50px; }\n  h1 { font-family: 'Playfair Display', serif; font-size: 36px; color: #5D4037; margin: 0 0 10px 0; }\n  .date { font-size: 24px; color: #795548; font-style: italic; margin-bottom: 15px; }\n  .description { font-size: 18px; line-height: 1.6; color: #4E342E; }\n  .watermark { position: absolute; bottom: 20px; right: 20px; font-size: 12px; color: #A1887F; }\n</style>\n</head>\n<body>\n  ${chapters.map(chapter => `\n    <div class=\"page\">\n      <div class=\"artwork-frame\">\n        <img src=\"${chapter.image_url}\" alt=\"${chapter.title}\">\n      </div>\n      <div class=\"caption-area\">\n        <h1>${chapter.title}</h1>\n        <div class=\"date\">${chapter.date}</div>\n        <div class=\"description\">${chapter.content}</div>\n      </div>\n      <div class=\"watermark\">CODEX • AI-Generated Historical Art</div>\n    </div>\n  `).join('')}\n</body>\n</html>`;\n}\n\nfunction getInfographicTemplate(jobData, chapters, language) {\n  // Infographic/educational style\n  return `<!DOCTYPE html>\n<html lang=\"${language}\">\n<head>\n<meta charset=\"UTF-8\">\n<title>${jobData.topic} - Visual Guide</title>\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Source+Sans+Pro:wght@400;600&display=swap');\n  body { margin: 0; padding: 0; background: #ffffff; font-family: 'Source Sans Pro', sans-serif; }\n  .infographic-page { width: 100vw; height: 100vh; padding: 40px; box-sizing: border-box; page-break-after: always; \n                      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }\n  .visual-panel { background: #f5f7fa; border-radius: 8px; padding: 20px; display: flex; align-items: center; justify-content: center; }\n  .visual-panel img { max-width: 100%; max-height: 100%; object-fit: contain; }\n  .info-panel { display: flex; flex-direction: column; justify-content: center; }\n  .chapter-number { font-family: 'Roboto Condensed', sans-serif; font-size: 24px; color: #3498db; \n                    margin-bottom: 10px; font-weight: bold; }\n  h1 { font-family: 'Roboto Condensed', sans-serif; font-size: 32px; color: #2c3e50; margin: 0 0 15px 0; }\n  .timeline-marker { display: inline-block; background: #e74c3c; color: white; padding: 5px 15px; \n                     border-radius: 20px; font-size: 18px; margin-bottom: 20px; }\n  .content { font-size: 16px; line-height: 1.6; color: #34495e; }\n  .key-points { margin-top: 20px; padding-left: 20px; border-left: 3px solid #3498db; }\n  .key-points li { margin-bottom: 8px; }\n  .footer { grid-column: 1 / -1; text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 20px; }\n</style>\n</head>\n<body>\n  ${chapters.map(chapter => `\n    <div class=\"infographic-page\">\n      <div class=\"visual-panel\">\n        <img src=\"${chapter.image_url}\" alt=\"${chapter.title}\">\n      </div>\n      <div class=\"info-panel\">\n        <div class=\"chapter-number\">CHAPTER ${chapter.chapter_id}</div>\n        <div class=\"timeline-marker\">${chapter.date}</div>\n        <h1>${chapter.title}</h1>\n        <div class=\"content\">${chapter.content}</div>\n        ${chapter.key_figures && chapter.key_figures.length > 0 ? `\n        <div class=\"key-points\">\n          <strong>Key Figures:</strong>\n          <ul>${chapter.key_figures.map(figure => `<li>${figure}</li>`).join('')}</ul>\n        </div>` : ''}\n      </div>\n      <div class=\"footer\">\n        ${jobData.topic} • CODEX Infographic Series • Generated ${new Date().toLocaleDateString()}\n      </div>\n    </div>\n  `).join('')}\n</body>\n</html>`;\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4120, 240],
+      "id": "html-generator",
+      "name": "HTML Generator"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rest-us.apitemplate.io/v2/create-pdf-from-html",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "{{YOUR_APITEMPLATE_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"body\": \"{{ $json.html_content.replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '') }}\",\n  \"data\": {\n    \"title\": \"{{ $json.jobData.topic }}\",\n    \"style\": \"{{ $json.template_used }}\",\n    \"chapters\": {{ $json.page_count }}\n  },\n  \"settings\": {\n    \"paper_size\": \"A4\",\n    \"orientation\": \"portrait\",\n    \"margin_top\": \"40\",\n    \"margin_bottom\": \"40\",\n    \"print_background\": \"1\",\n    \"displayHeaderFooter\": true,\n    \"headerTemplate\": \"<div style='width:100%;text-align:center;font-size:10px;color:#666;'>{{ $json.jobData.topic }}</div>\",\n    \"footerTemplate\": \"<div style='width:100%;text-align:center;font-size:9px;color:#999;'>Page <span class='pageNumber'></span> of <span class='totalPages'></span> • CODEX AI Historian</div>\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [4280, 240],
+      "id": "pdf-generation-api",
+      "name": "PDF Generation API"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.download_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [4440, 240],
+      "id": "download-pdf",
+      "name": "Download PDF"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.jobData.topic }}_{{ $json.jobData.id }}.pdf",
+        "parentFolder": "1FOLDER_ID_HERE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [4600, 240],
+      "id": "upload-to-drive",
+      "name": "Upload to Google Drive"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": "1DoalR9fh3oGZoxGSlZaTxPy9tJX4SLp4HJxUfdIXO-E",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.jobData.id }}",
+            "Status": "Completed",
+            "PDF Link": "={{ $json.webViewLink }}",
+            "Completed At": "={{ new Date().toISOString() }}",
+            "Total Time": "={{ Math.round((new Date() - new Date($json.jobData.createdAt)) / 1000) }}s",
+            "Pages": "={{ $json.page_count }}"
+          },
+          "matchingColumns": ["ID"]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [4760, 240],
+      "id": "final-status-update",
+      "name": "Final Status Update"
+    },
+    {
+      "parameters": {
+        "jsCode": "module.exports = async function (input) {\n  const { jobData, webViewLink } = input.json;\n  const source = jobData.source;\n  \n  // Format completion message based on source\n  const messages = {\n    telegram: {\n      text: `✅ *Your history book is ready!*\\n\\n📚 **${jobData.topic}**\\n📄 ${jobData.metadata.estimatedChapters} pages\\n⏱️ Generated in ${Math.round((new Date() - new Date(jobData.createdAt)) / 60000)} minutes\\n🔗 [Download PDF](${webViewLink})\\n\\n_Keep history alive with CODEX AI_`,\n      parse_mode: 'Markdown'\n    },\n    discord: {\n      content: `📚 **${jobData.topic}** is ready!\\nGenerated ${jobData.metadata.estimatedChapters} pages in ${Math.round((new Date() - new Date(jobData.createdAt)) / 60000)} minutes\\n🔗 Download: ${webViewLink}\\n\\n*Powered by CODEX AI Historian*`\n    },\n    web: {\n      text: `Your book \"${jobData.topic}\" is complete! Download: ${webViewLink}`,\n      sessionId: jobData.metadata.sessionId\n    }\n  };\n  \n  const response = messages[source] || messages.telegram;\n  \n  return {\n    source: source,\n    recipient: jobData.metadata.chatId || jobData.metadata.channelId || jobData.metadata.sessionId,\n    message: response,\n    jobData: jobData,\n    pdfUrl: webViewLink,\n    timestamp: new Date().toISOString()\n  };\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4920, 240],
+      "id": "notification-formatter",
+      "name": "Notification Formatter"
+    },
+    {
+      "parameters": {
+        "conditions": [
+          {
+            "leftValue": "={{ $json.source }}",
+            "rightValue": "telegram",
+            "operator": {
+              "type": "string",
+              "operation": "equals"
+            }
+          }
+        ],
+        "combinator": "and"
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [5080, 240],
+      "id": "destination-router",
+      "name": "Destination Router"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.recipient }}",
+        "text": "={{ $json.message.text }}",
+        "additionalFields": {
+          "parse_mode": "={{ $json.message.parse_mode || 'HTML' }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [5240, 200],
+      "id": "send-telegram",
+      "name": "Send to Telegram"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $json.message.content }}\",\n  \"embeds\": [\n    {\n      \"title\": \"{{ $json.jobData.topic }}\",\n      \"description\": \"AI-generated history book ready for download\",\n      \"color\": 5814783,\n      \"fields\": [\n        {\n          \"name\": \"Pages\",\n          \"value\": \"{{ $json.jobData.metadata.estimatedChapters }}\",\n          \"inline\": true\n        },\n        {\n          \"name\": \"Style\",\n          \"value\": \"{{ $json.jobData.style }}\",\n          \"inline\": true\n        },\n        {\n          \"name\": \"Download\",\n          \"value\": \"[Click Here]({{ $json.pdfUrl }})\"\n        }\n      ],\n      \"footer\": {\n        \"text\": \"CODEX AI Historian\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [5240, 320],
+      "id": "send-discord",
+      "name": "Send to Discord"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "callback",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.2,
+      "position": [5240, 440],
+      "id": "web-callback",
+      "name": "Web Callback"
+    },
+    {
+      "parameters": {
+        "content": "# 🚀 CODEX AI HISTORIAN v3.0\n## Tony Stark Edition\n\n### Features:\n1. Multi-input (Telegram, Discord, Web)\n2. 4 Visual Styles\n3. Multi-language Support\n4. Advanced Error Handling\n5. Real-time Tracking\n\n*\"The future is already here\"*",
+        "height": 200,
+        "width": 800,
+        "color": 1
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [40, 40],
+      "typeVersion": 1,
+      "id": "title-note",
+      "name": "Title Note"
+    }
+  ],
+  "connections": {
+    "Telegram Input Gateway": {
+      "main": [[{ "node": "input-processor", "type": "main", "index": 0 }]]
+    },
+    "Web/Discord Input": {
+      "main": [[{ "node": "input-processor", "type": "main", "index": 0 }]]
+    },
+    "input-processor": {
+      "main": [[{ "node": "topic-enhancer", "type": "main", "index": 0 }]]
+    },
+    "topic-enhancer": {
+      "main": [[{ "node": "job-orchestrator", "type": "main", "index": 0 }]]
+    },
+    "enhancer-parser": {
+      "ai_outputParser": [[{ "node": "topic-enhancer", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "job-orchestrator": {
+      "main": [
+        [{ "node": "log-research-start", "type": "main", "index": 0 }],
+        [{ "node": "research-delay", "type": "main", "index": 0 }]
+      ]
+    },
+    "log-research-start": {
+      "main": [[{ "node": "research-delay", "type": "main", "index": 0 }]]
+    },
+    "research-delay": {
+      "main": [[{ "node": "research-master", "type": "main", "index": 0 }]]
+    },
+    "research-master": {
+      "main": [[{ "node": "chapter-processor", "type": "main", "index": 0 }]]
+    },
+    "gpt-5-researcher": {
+      "ai_languageModel": [[{ "node": "research-master", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "research-parser": {
+      "ai_outputParser": [[{ "node": "research-master", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "chapter-processor": {
+      "main": [
+        [{ "node": "update-image-gen", "type": "main", "index": 0 }],
+        [{ "node": "split-chapters", "type": "main", "index": 0 }]
+      ]
+    },
+    "update-image-gen": {
+      "main": [[{ "node": "split-chapters", "type": "main", "index": 0 }]]
+    },
+    "split-chapters": {
+      "main": [[{ "node": "prompt-enhancer", "type": "main", "index": 0 }]]
+    },
+    "prompt-enhancer": {
+      "main": [[{ "node": "image-generation-api", "type": "main", "index": 0 }]]
+    },
+    "image-generation-api": {
+      "main": [[{ "node": "api-delay", "type": "main", "index": 0 }]]
+    },
+    "api-delay": {
+      "main": [[{ "node": "check-generation-status", "type": "main", "index": 0 }]]
+    },
+    "check-generation-status": {
+      "main": [[{ "node": "image-status-switch", "type": "main", "index": 0 }]]
+    },
+    "image-status-switch": {
+      "main": [
+        [], // failed branch (empty for now)
+        [{ "node": "retry-logic", "type": "main", "index": 0 }], // retry branch
+        [{ "node": "download-image", "type": "main", "index": 0 }] // success branch
+      ]
+    },
+    "retry-logic": {
+      "main": [[{ "node": "image-generation-api", "type": "main", "index": 0 }]]
+    },
+    "download-image": {
+      "main": [[{ "node": "upload-to-cloudinary", "type": "main", "index": 0 }]]
+    },
+    "upload-to-cloudinary": {
+      "main": [[{ "node": "update-image-metadata", "type": "main", "index": 0 }]]
+    },
+    "update-image-metadata": {
+      "main": [[{ "node": "merge-chapters", "type": "main", "index": 0 }]]
+    },
+    "merge-chapters": {
+      "main": [[{ "node": "aggregate-completed", "type": "main", "index": 0 }]]
+    },
+    "aggregate-completed": {
+      "main": [
+        [{ "node": "update-pdf-gen", "type": "main", "index": 0 }],
+        [{ "node": "html-generator", "type": "main", "index": 0 }]
+      ]
+    },
+    "update-pdf-gen": {
+      "main": [[{ "node": "html-generator", "type": "main", "index": 0 }]]
+    },
+    "html-generator": {
+      "main": [[{ "node": "pdf-generation-api", "type": "main", "index": 0 }]]
+    },
+    "pdf-generation-api": {
+      "main": [[{ "node": "download-pdf", "type": "main", "index": 0 }]]
+    },
+    "download-pdf": {
+      "main": [[{ "node": "upload-to-drive", "type": "main", "index": 0 }]]
+    },
+    "upload-to-drive": {
+      "main": [
+        [{ "node": "final-status-update", "type": "main", "index": 0 }],
+        [{ "node": "notification-formatter", "type": "main", "index": 0 }]
+      ]
+    },
+    "final-status-update": {
+      "main": [[{ "node": "notification-formatter", "type": "main", "index": 0 }]]
+    },
+    "notification-formatter": {
+      "main": [[{ "node": "destination-router", "type": "main", "index": 0 }]]
+    },
+    "destination-router": {
+      "main": [
+        [{ "node": "send-telegram", "type": "main", "index": 0 }], // telegram
+        [{ "node": "send-discord", "type": "main", "index": 0 }], // discord
+        [{ "node": "web-callback", "type": "main", "index": 0 }] // web
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "codex-v3-tony-stark",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "codex-ai-historian-prod"
+  },
+  "tags": ["ai", "history", "pdf", "automation", "education", "codex"]
+}

@@ -1,0 +1,535 @@
+{
+  "name": "AI Meeting to CRM with Safety Gates",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook_trigger",
+      "name": "Webhook - Meeting Completed",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "meeting-intake"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.transcript }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.body.meeting_id }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.body.participants }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "validate_inputs",
+      "name": "Validate Required Inputs",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"error\", \"message\": \"Missing required fields: transcript, meeting_id, or participants\", \"execution_id\": $json.execution_id } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond_validation_fail",
+      "name": "Respond - Validation Failed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 480]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "execution_id",
+              "name": "execution_id",
+              "value": "={{ $now.format('yyyyMMdd-HHmmss') }}-{{ $json.body.meeting_id }}",
+              "type": "string"
+            },
+            {
+              "id": "transcript",
+              "name": "transcript",
+              "value": "={{ $json.body.transcript }}",
+              "type": "string"
+            },
+            {
+              "id": "meeting_id",
+              "name": "meeting_id",
+              "value": "={{ $json.body.meeting_id }}",
+              "type": "string"
+            },
+            {
+              "id": "participants",
+              "name": "participants",
+              "value": "={{ $json.body.participants }}",
+              "type": "string"
+            },
+            {
+              "id": "deal_id",
+              "name": "deal_id",
+              "value": "={{ $json.body.deal_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "human_notes",
+              "name": "human_notes",
+              "value": "={{ $json.body.human_notes || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "input_snapshot",
+              "name": "input_snapshot",
+              "value": "={{ JSON.stringify($json.body) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare_execution_context",
+      "name": "Prepare Execution Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [680, 180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"accepted\", \"execution_id\": $json.execution_id, \"message\": \"Meeting processing started\" } }}",
+        "options": {}
+      },
+      "id": "respond_accepted",
+      "name": "Respond - Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 180]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "anthropicApi",
+        "resource": "message",
+        "operation": "create",
+        "model": "claude-sonnet-4-20250514",
+        "prompt": "=You are a precise extraction system. Extract structured information from this meeting.\n\nTRANSCRIPT:\n{{ $json.transcript }}\n\nPARTICIPANTS:\n{{ $json.participants }}\n\nHUMAN NOTES (if any):\n{{ $json.human_notes }}\n\nExtract the following and respond ONLY with valid JSON:\n\n{\n  \"summary\": \"2-3 sentence meeting summary\",\n  \"action_items\": [\n    {\"task\": \"description\", \"owner\": \"name or unknown\", \"confidence\": 0.0-1.0}\n  ],\n  \"crm_updates\": {\n    \"stage_change\": \"new stage or null\",\n    \"next_step\": \"description or null\",\n    \"confidence\": 0.0-1.0\n  },\n  \"follow_ups\": [\n    {\"type\": \"email|call|task\", \"recipient\": \"name\", \"intent\": \"description\", \"is_external\": true|false, \"confidence\": 0.0-1.0}\n  ],\n  \"overall_confidence\": 0.0-1.0,\n  \"flags\": [\"any concerns or ambiguities\"]\n}\n\nRules:\n- Set confidence to 0 if information is unclear\n- Flag any conflicting information\n- Mark is_external=true for customer/prospect emails\n- Use \"unknown\" for unclear owners",
+        "options": {
+          "maxTokens": 2000,
+          "temperature": 0.1
+        }
+      },
+      "id": "llm_extract_structured",
+      "name": "LLM - Extract Structured Data",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1,
+      "position": [1120, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and validate LLM output\nconst executionId = $input.first().json.execution_id;\nconst rawResponse = $input.first().json.response;\n\nlet extracted;\ntry {\n  // Try to parse JSON from response\n  const jsonMatch = rawResponse.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) {\n    throw new Error('No JSON found in response');\n  }\n  extracted = JSON.parse(jsonMatch[0]);\n} catch (error) {\n  return [{\n    json: {\n      execution_id: executionId,\n      status: 'extraction_failed',\n      error: error.message,\n      raw_response: rawResponse,\n      decision_log: {\n        timestamp: new Date().toISOString(),\n        stage: 'llm_extraction',\n        result: 'failed',\n        reason: 'JSON parse error'\n      }\n    }\n  }];\n}\n\n// Validate confidence thresholds\nconst MIN_CONFIDENCE = 0.7;\nconst validationResult = {\n  execution_id: executionId,\n  extracted_data: extracted,\n  validation: {\n    overall_confidence_pass: extracted.overall_confidence >= MIN_CONFIDENCE,\n    crm_update_safe: extracted.crm_updates?.confidence >= MIN_CONFIDENCE,\n    external_emails_detected: extracted.follow_ups?.some(f => f.is_external && f.confidence >= MIN_CONFIDENCE) || false,\n    flags: extracted.flags || [],\n    requires_human_review: false\n  },\n  decision_log: {\n    timestamp: new Date().toISOString(),\n    stage: 'extraction_validation',\n    confidence_scores: {\n      overall: extracted.overall_confidence,\n      crm: extracted.crm_updates?.confidence || 0,\n      actions: extracted.action_items?.map(a => a.confidence) || []\n    }\n  }\n};\n\n// Determine if human review needed\nif (!validationResult.validation.overall_confidence_pass) {\n  validationResult.validation.requires_human_review = true;\n  validationResult.validation.review_reason = 'Low overall confidence';\n} else if (validationResult.validation.external_emails_detected) {\n  validationResult.validation.requires_human_review = true;\n  validationResult.validation.review_reason = 'External email detected - requires approval';\n} else if (!validationResult.validation.crm_update_safe && extracted.crm_updates?.stage_change) {\n  validationResult.validation.requires_human_review = true;\n  validationResult.validation.review_reason = 'CRM stage change with low confidence';\n} else if (extracted.flags?.length > 0) {\n  validationResult.validation.requires_human_review = true;\n  validationResult.validation.review_reason = 'LLM flagged concerns: ' + extracted.flags.join(', ');\n}\n\nreturn [{ json: validationResult }];"
+      },
+      "id": "validate_extraction",
+      "name": "Validate Extraction & Check Safety",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.validation.requires_human_review }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check_human_review",
+      "name": "Requires Human Review?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1560, 180]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "taskListId": "YOUR_GOOGLE_TASKS_LIST_ID",
+        "title": "={{ \"[APPROVAL NEEDED] Meeting \" + $json.execution_id }}",
+        "additionalFields": {
+          "notes": "=Execution ID: {{ $json.execution_id }}\n\nREVIEW REASON: {{ $json.validation.review_reason }}\n\n--- EXTRACTED DATA ---\nSummary: {{ $json.extracted_data.summary }}\n\nCRM Updates:\n{{ JSON.stringify($json.extracted_data.crm_updates, null, 2) }}\n\nFollow-ups:\n{{ JSON.stringify($json.extracted_data.follow_ups, null, 2) }}\n\nAction Items:\n{{ JSON.stringify($json.extracted_data.action_items, null, 2) }}\n\nFlags: {{ $json.extracted_data.flags?.join(', ') || 'None' }}\n\n--- APPROVAL ACTIONS ---\nTo approve: Reply to this task with 'APPROVED'\nTo reject: Reply with 'REJECTED'\n\nAuto-expires in 24 hours."
+        }
+      },
+      "id": "create_approval_task",
+      "name": "Create Approval Task",
+      "type": "n8n-nodes-base.googleTasks",
+      "typeVersion": 1,
+      "position": [1780, 80],
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "YOUR_GOOGLE_TASKS_CREDENTIAL_ID",
+          "name": "Google Tasks Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "wait_for_approval",
+      "name": "Wait for Approval (24h timeout)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [2000, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "approval_status",
+              "name": "approval_status",
+              "value": "timeout",
+              "type": "string"
+            },
+            {
+              "id": "execution_id",
+              "name": "execution_id",
+              "value": "={{ $json.execution_id }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "mark_as_timeout",
+      "name": "Mark as Timeout",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [2220, 80]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Auto-approved - execute safe internal actions only\nconst data = $input.first().json;\nconst executionId = data.execution_id;\nconst extracted = data.extracted_data;\n\n// Prepare safe actions (internal only, no external emails, no risky CRM changes)\nconst safeActions = [];\n\n// Add internal action items\nif (extracted.action_items?.length > 0) {\n  extracted.action_items.forEach((item, idx) => {\n    if (item.confidence >= 0.7) {\n      safeActions.push({\n        type: 'create_task',\n        data: {\n          title: item.task,\n          owner: item.owner,\n          source_meeting: executionId\n        }\n      });\n    }\n  });\n}\n\n// Add safe CRM update (next step only, no stage change)\nif (extracted.crm_updates?.next_step && extracted.crm_updates.confidence >= 0.7) {\n  safeActions.push({\n    type: 'update_crm_note',\n    data: {\n      deal_id: data.deal_id,\n      note: `Meeting Summary: ${extracted.summary}\\n\\nNext Step: ${extracted.crm_updates.next_step}`,\n      source_meeting: executionId\n    }\n  });\n}\n\nreturn [{\n  json: {\n    execution_id: executionId,\n    status: 'auto_approved',\n    actions: safeActions,\n    decision_log: {\n      timestamp: new Date().toISOString(),\n      stage: 'execution_approval',\n      result: 'auto_approved',\n      reason: 'All checks passed, only safe actions'\n    }\n  }\n}];"
+      },
+      "id": "prepare_safe_actions",
+      "name": "Prepare Safe Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 280]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.actions }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check_has_actions",
+      "name": "Has Actions to Execute?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [2000, 280]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "execution_id",
+              "name": "execution_id",
+              "value": "={{ $json.execution_id }}",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "completed",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "No actions required",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "no_actions_needed",
+      "name": "No Actions Needed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [2220, 380]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "execution_id",
+              "name": "execution_id",
+              "value": "={{ $json.execution_id }}",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "completed_with_actions",
+              "type": "string"
+            },
+            {
+              "id": "actions_executed",
+              "name": "actions_executed",
+              "value": "={{ $json.actions.length }}",
+              "type": "number"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "log_completion",
+      "name": "Log Successful Completion",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [2220, 180]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO meeting_execution_log (execution_id, status, input_snapshot, decision_log, timestamp) VALUES ('{{ $json.execution_id }}', '{{ $json.status }}', '{{ $json.input_snapshot }}', '{{ JSON.stringify($json.decision_log) }}', NOW())",
+        "options": {}
+      },
+      "id": "log_to_database",
+      "name": "Log to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [2440, 180],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres Database"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook - Meeting Completed": {
+      "main": [
+        [
+          {
+            "node": "Validate Required Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Inputs": {
+      "main": [
+        [
+          {
+            "node": "Prepare Execution Context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Validation Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Execution Context": {
+      "main": [
+        [
+          {
+            "node": "Respond - Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond - Accepted": {
+      "main": [
+        [
+          {
+            "node": "LLM - Extract Structured Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM - Extract Structured Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Extraction & Check Safety",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Extraction & Check Safety": {
+      "main": [
+        [
+          {
+            "node": "Requires Human Review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requires Human Review?": {
+      "main": [
+        [
+          {
+            "node": "Create Approval Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Safe Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Approval Task": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval (24h timeout)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval (24h timeout)": {
+      "main": [
+        [
+          {
+            "node": "Mark as Timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Safe Actions": {
+      "main": [
+        [
+          {
+            "node": "Has Actions to Execute?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Actions to Execute?": {
+      "main": [
+        [
+          {
+            "node": "Log Successful Completion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Actions Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Successful Completion": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Actions Needed": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Timeout": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-24T00:00:00.000Z",
+  "versionId": "1"
+}

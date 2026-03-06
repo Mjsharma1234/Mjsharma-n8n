@@ -1,0 +1,3905 @@
+{
+  "name": "AI Outreach Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lead Acquisition from Apollo(Apify API)\n#### This workflow fetches qualified leads from Apolloio based on specific criteria (e.g., industry, location, job title) and stores the data, including names, LinkedIn profiles, and email addresses, in Google Sheets for further processing.",
+        "height": 800,
+        "width": 1840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        200
+      ],
+      "id": "255afc2d-4125-440c-8941-b037e75d2723",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Personalized Outreach Message Generation\n### Using the fetched leads, this workflow enriches the data by conducting additional research with SerpAPI, generates personalized icebreakers, and crafts tailored email and LinkedIn messages using AI models, ensuring each outreach is relevant and engaging.",
+        "height": 1020,
+        "width": 2420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "0a5648ae-8570-46e2-af13-45544e9c8c3d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Execute the Linkedin Invite TRacker Workflow",
+        "height": 80,
+        "width": 300,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        240
+      ],
+      "id": "8d48d10b-6687-47b7-86d1-0786dca9d5c6",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Retrieves the provider ID from Unipile based on a LinkedIn profile URL. The node extracts the LinkedIn username from the URL and makes an API request to fetch user details.",
+        "height": 140,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        260
+      ],
+      "id": "e0873e61-cdbf-4bb0-87a5-5220b9d872ca",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### Automatically creates a Google Spreadsheet, dynamically naming it based on the chat query.",
+        "height": 100,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        700
+      ],
+      "id": "ea996549-93c2-45f0-8887-0d102160d5fb",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Automated LinkedIn & Email Outreach: Smart Lead Engagement with Unipile\n### This workflow automates the outreach process by sending personalized LinkedIn invitations and emails to leads retrieved from a Google Sheet. \n### It utilizes the Unipile API to send LinkedIn invitations with tailored icebreaker messages, updates the invitation status in the Google Sheet, and sends personalized emails via Gmail, while logging the email sent history in a PostgreSQL database for effective tracking and follow-up.",
+        "height": 460,
+        "width": 3200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1060
+      ],
+      "id": "a7b8e429-d180-49d4-bb1a-f6a7d37e9b8d",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "### When executed by the first workflow.",
+        "height": 80,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        1380
+      ],
+      "id": "19ca96e5-9b65-4e23-a2f1-d44190ecc52a",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "### Saves LinkedIn invite history to a PostgreSQL database, storing session IDs and AI-generated icebreaker messages for tracking and future reference.",
+        "height": 140,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        1380
+      ],
+      "id": "64113fc9-0264-45ef-81d4-2d4adf48511e",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "### Randomizer code and wait node. Generates a random number (0-7) and sets it as the wait time, introducing variability and a human-like delay to the automation for a more natural execution flow.",
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1940,
+        1080
+      ],
+      "id": "eab6443b-bbd9-4af4-9382-cec73f3bb954",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Engage Instantly: Auto-Message New LinkedIn Connections\n### This automates the process of updating a Google Sheets document when a LinkedIn connection request is accepted, marking the invitation as accepted.\n### It also sends a message to the new connection and logs the interaction in a database, ensuring seamless communication and tracking.",
+        "height": 400,
+        "width": 2280,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        1560
+      ],
+      "id": "e880edd7-c121-456b-a26c-d85f102a8a16",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "### Fetches the LinkedIn message body from  Google Sheet based on the provider ID",
+        "height": 100,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        1860
+      ],
+      "id": "e68b8fc9-06cf-484a-907c-380c435ffa4b",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "### When new message recieved (webhook created in Unipile)",
+        "height": 100,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        1840
+      ],
+      "id": "184a0827-ee94-4c38-aab6-eb30464306fa",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Smart LinkedIn Reply Bot: AI-Powered Messaging & Tracking\n### Automates the process of responding to received messages from LinkedIn connections, checking the number of messages exchanged, and updating a Google Sheets document accordingly. \n### It utilizes an AI agent to craft personalized responses and logs the interaction in a database, ensuring effective communication management.",
+        "height": 520,
+        "width": 2280,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        2000
+      ],
+      "id": "5017d338-9095-4b3b-8163-905bbbe3e618",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/actor-runs/{{ $json.data.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "waitForFinish",
+              "value": "60"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        540
+      ],
+      "id": "772e8f8f-e35a-4ace-9fbb-6b646dad40da",
+      "name": "HTTP Request7",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "QA5pLVHPI6nCmxZx",
+          "name": "Apify2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $json.defaultDatasetID }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        540
+      ],
+      "id": "59ac0588-f3b4-404d-906b-2c21023dbdcb",
+      "name": "HTTP Request8",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "QA5pLVHPI6nCmxZx",
+          "name": "Apify2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1440,
+        540
+      ],
+      "id": "3c06a602-c526-45ff-b57c-5671bac8f5f0",
+      "name": "When chat message received",
+      "webhookId": "324ff9eb-54f2-4060-9b61-0f34cb96b2f3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "22e8f927-4d24-4664-a988-65effc034057",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        540
+      ],
+      "id": "81b0358b-d97b-45d0-8791-573cd7b11df4",
+      "name": "If3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        420,
+        740
+      ],
+      "id": "a59b4005-bba1-406c-b5f6-23270c5f5a33",
+      "name": "Wait",
+      "webhookId": "53e99063-a73a-40c2-a543-314d3d3a9aa2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af77e1f5-f2bf-4f04-b84a-03a673422e26",
+              "name": "defaultDatasetID",
+              "value": "={{ $json.data.defaultDatasetId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -20,
+        540
+      ],
+      "id": "1e965e76-9972-4dd5-b774-312baa420433",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b754b255-7f0c-4ef8-9eb7-03773c32e8f4",
+              "leftValue": "={{ $json.linkedin_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "251e8b8c-bb21-4933-b0f8-5e47a9ef1507",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        620,
+        440
+      ],
+      "id": "2392fa1a-2b78-4136-9617-a42bde097c31",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        640
+      ],
+      "id": "cd01e06c-5267-45c7-8dbd-da06b9d890cc",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "CEN9EMxN2jiXueej",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        640
+      ],
+      "id": "d1e75608-f162-4e72-b287-ab350641701b",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIxeaCNdUBfgw6fq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1580,
+        640
+      ],
+      "id": "069fb815-2764-4ce6-b3b2-4f97e0354f3c",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIxeaCNdUBfgw6fq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"EmailIceBreaker\": \"Icebreaker\",\n\t\"LinkedinIceBreaker\": \"IceBreaker\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        640
+      ],
+      "id": "c693c7ab-4496-4c12-b009-7498d4b4a624",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1940,
+        680
+      ],
+      "id": "56d8861a-18fe-49fd-a451-b363f5df6031",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIxeaCNdUBfgw6fq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"email\": {\n      \"subject\":\"Building Wellness and Success with AI\",\n      \"body\":\"Hi Masood,  \\n\\nI was impressed to learn about Elysian Real Estate's focus on wellness in property design—how's the journey of your Dubai Islands project shaping up?  \\n\\nAt [Your Agency Name], we work with forward-thinking leaders like yourself to drive more impact. Leveraging AI-driven automation, we help real estate agencies streamline administrative tasks, attract more qualified leads, and close deals faster—all without compromising the personalized service your clients value.  \\n\\nGiven your commitment to innovation and exceptional lifestyle-focused projects, I’d love to explore how AI can help amplify your team's efficiency as you grow your portfolio. Are you open to a quick chat next week?  \\n\\nLooking forward to hearing your thoughts,  \\nKrishnaraj\"\n    },\n\t\"linkedin\":{\n      \"body\":\"Hi Masood,  \\n\\nYour focus on wellness in real estate is inspiring! How's the Dubai Islands project coming along?  \\n\\nTo introduce myself, I specialize in helping real estate leaders like you leverage AI automation to enhance operations, optimize lead generation, and close deals faster. Considering Elysian Real Estate’s dedication to innovation, I believe there’s a lot of potential to streamline processes and free up time for your team to focus on what matters most—delivering exceptional experiences.  \\n\\nWould love to explore this further. Open to connecting?  \\n\\nBest regards,  \\nKrishnaraj\"\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2120,
+        660
+      ],
+      "id": "2c5c2fc3-59fe-4e88-af8c-afdf1d54b088",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "jsCode": "items[0].json.RandomNumber = Math.floor(Math.random() * 8);\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        420
+      ],
+      "id": "50c0a7c6-55f8-47b6-b0a4-dcb5f2cfbe2c",
+      "name": "randomizer"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        740,
+        660
+      ],
+      "id": "cd0addc0-ec62-45df-ad57-871536312e9d",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Linkedin Profile Url: {{ $json.linkedin_url }}\nOgranisation Name:{{ $json.organization.name }}\nPosition:{{ $json.seniority }}\nheadline of person:{{ $json.headline }}",
+        "options": {
+          "systemMessage": "=## Role\nYou are a research assistant AI that gathers relevant details about a specific person using SerpApi. Your goal is to extract factual and publicly available information to serve as conversation starters in an email.\n\n## Instructions\n- Use SerpApi to search for the person's publicly available professional and personal details.\n- Gather information from sources such as:\n- Recent news articles, blog posts, or interviews.\n- LinkedIn or other professional profiles.\n- Social media posts relevant to their interests, achievements, or work.\n- Books, papers, or patents they have authored.\n- Extract relevant and specific details, such as:\n- Recent achievements, awards, or projects.\n- Professional background and current role.\n- Shared interests, hobbies, or affiliations.\n- Notable quotes or insights they have shared.\n- Present the information in a clean, structured format without additional commentary or suggestions.\n- Do not include any speculative or private details.\n\n## Rules\n- Only use verified and public sources.\n- Do not include opinions, assumptions, or unverifiable claims.\n- Structure the output as a list of key facts for easy reference."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1200,
+        420
+      ],
+      "id": "ca3623fd-932f-4c61-b472-b819a1ddd0b0",
+      "name": "Get More info on Person"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the information of the person:\nPersonName: {{ $('Loop Over Items1').item.json.name }}\nLinkedin Profile URL : {{ $('Loop Over Items1').item.json.linkedin_url }}\nCompany: {{ $('Loop Over Items1').item.json.organization.name }}\nPosition : {{ $('Loop Over Items1').item.json.seniority }}\n\nResearch Information: {{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You specialize in cold outreach. Generate an engaging first-line icebreaker separately for email and LinkedIn.\n\n- Only provide the icebreaker, nothing else.\n- Base the icebreaker on the research information.\n- Keep it concise—one sentence only.\n- Write naturally, using clear and simple language.\n- Ensure it flows smoothly into an offer.\n- The LinkedIn version must not exceed 180 characters, including spaces and punctuation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1560,
+        420
+      ],
+      "id": "c5af6b57-4f99-4d26-809d-8b46f7cfe155",
+      "name": "IceBreaker Creation Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the information of the person:\n\nname of the person:{{ $('Loop Over Items1').item.json.name }}\nLinkedin_url:{{ $('Loop Over Items1').item.json.linkedin_url }}\nOraganizationName: {{ $('Loop Over Items1').item.json.organization.name }}\nPosition:{{ $('Loop Over Items1').item.json.seniority }}\n\nResearch information :{{ $('Get More info on Person').item.json.output }}\n\nIceBreaker for Email:{{ $json.output.EmailIceBreaker }}\nIceBreaker for Linkedin:{{ $json.output.LinkedinIceBreaker }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Role\nYou are a Cold Outreach Specialist helping an AI automation agency connect with real estate agency owners. Your goal is to craft highly personalized cold emails and LinkedIn messages that highlight the benefits of AI-driven automation for real estate businesses.\n\n## Instructions\n- Research Personalization: Use available research insights to customize each message.\n- Engaging Icebreaker: Rephrase the opening to make it engaging and ensure a smooth transition into the message.\n- Conversational & Human Tone: Write as if a human is speaking—simple, natural, and clear.\n- Email & LinkedIn Message Structure:\nEmail: A compelling subject line, engaging icebreaker, concise value proposition, and a strong call-to-action.\nLinkedIn Message: Ensure the body flows naturally from the icebreaker, using phrases like \"as I mentioned.\"\n- Value Proposition: Clearly communicate how AI automation can help real estate agencies streamline operations, generate leads, and close deals faster.\n- Signature: Sign both messages as [your name]\n\n## Rules\n- Do not use generic or robotic language.\n- Do not repeat the icebreaker verbatim in the LinkedIn message body.\n-  Keep messages concise and to the point.\n-  Ensure messages are relevant to real estate agency owners."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1940,
+        420
+      ],
+      "id": "4a2df998-82be-437d-817d-3900aa917aac",
+      "name": "Generate LN & Email Intro Msg"
+    },
+    {
+      "parameters": {
+        "url": "=https://[subdomain].unipile.com:[port]/api/v1/users/{{ $('Loop Over Items1').item.json.linkedin_url.split('/in/') [1] }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "your_unipile_account_id"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "your _unipile_api_key"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2600,
+        420
+      ],
+      "id": "5bb40ec6-0ed4-4af4-a5e9-837a2ba6dffa",
+      "name": "getProviderID"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_query }}",
+        "options": {
+          "systemMessage": "=## Role\n\nYou are an AI assistant that helps users generate URLs for searching people on Apollo.io. Your task is to extract the following four parameters from the user's input:\n\n1. **Industry Id**: \n2.**Employee Range**: The range of employees in the organization. \n   - If a minimum employee count is not provided, default to **10**.\n   - If a maximum employee count is not provided, default to **1,000,000**.\n  - Don't include the number of employees in the url if the user didn't specify it.\n3. **Location**: The location of the company (e.g., \"California, US\" or \"Mumbai, India\" )or Countries (example: USA, UAE ,India)\n4. **Job Title**: The job title of the person (e.g., \"Owner\", \"Realtor\", \"Manager\", \"Project Manager\", \"Consultant\").\n5.**Industry ID**: The industry code corresponding to the industry.\n\n### **Industry Codes**\nHere are some common industry codes you can use:\n- **Real Estate**: `5567cd477369645401010000`\n- **Marketing & Advertising**: `5567cd467369644d39040000`\n- **Construction**: `5567cd4773696439dd350000`\n- **Hospitality**: `5567ce9d7369643bc19c0000`\n- **Computer Software**: `5567cd4e7369643b70010000`\n- **Professional Training & Coaching**: `5567cd49736964541d010000`\n- **Staffing & Recruiting**: `5567e09973696410db020800`\n- *Information Technology and Services**: `5567cd4773696439b10b0000`\n- **consumer services**: `5567d1127261697f2b1d0000`\n- **Health,wellness & fitness** : `5567cddb7369644d250c0000`\n- **Hospital & healthcare**: `5567cdde73696439812c0000`\n- **food & beverages** : `5567ce1e7369643b806a0000`\n- **retail** : `5567ced173696450cb580000`\n- **financial services**: `5567cdd67369643e64020000`\n- **education management** : `5567ce9e736964540d540000`\n\n\nOnce you extract these parameters, construct a URL using the following format:\n\n\nOnce you extract these parameters, construct a URL using the following format:\n\nhttps://app.apollo.io/#/people?page=1&sortAscending=false&sortByField=recommendations_score&organizationIndustryTagIds[]=<INDUSTRY_ID>&personLocations[]=<LOCATION>&organizationNumEmployeesRanges[]=<MIN_EMPLOYEE>%2C<MAX_EMPLOYEE>&personTitles[]=<JOB_TITLE>&contactEmailStatusV2[]=verified\n\n#### **Example : Owners of Real Estate Companies in the UAE with Employee Range from 10**\n\nhttps://app.apollo.io/#/people?page=1&sortAscending=false&sortByField=recommendations_score&organizationIndustryTagIds[]=5567cd477369645401010000&personLocations[]=UAE&organizationNumEmployeesRanges[]=10%2C1000000&personTitles[]=owner&contactEmailStatusV2[]=verified\n\n## Notes\n- Don't include the number of employees in the url if the user didn't specify it.\n- Dont provide any other preamble .Only the output url\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1020,
+        540
+      ],
+      "id": "e933c811-afdf-4168-a7a6-75ceb2910dc4",
+      "name": "Apollo  Url Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/code_crafter~apollo-scraper/runs?token=your_apify_api_token",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"getPersonalEmails\": true,\n    \"getWorkEmails\": true,\n    \"totalRecords\": 100,\n    \"url\": \"{{ $('Apollo  Url Agent').item.json.output }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        540
+      ],
+      "id": "e59c2cd9-87e5-42d1-b084-c1e145881bdd",
+      "name": "Apollo Apify"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "349c895e-7f11-4e20-9085-3b5e40a7c2e0",
+              "name": "id",
+              "value": "={{ $('Loop Over Items1').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "bdb2086c-86e4-424d-afd3-d9ad1401c840",
+              "name": "first_name",
+              "value": "={{ $('Loop Over Items1').item.json.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bff7597c-c9f3-4e95-ac6b-4fc15f23a5d9",
+              "name": "last_name",
+              "value": "={{ $('Loop Over Items1').item.json.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "1bcade93-8ebe-4f8c-89ef-125268f159a0",
+              "name": "name",
+              "value": "={{ $('Loop Over Items1').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "085b5d38-e0f4-42e1-ad08-5cb05459a7ab",
+              "name": "linkedin_url",
+              "value": "={{ $('Loop Over Items1').item.json.linkedin_url }}",
+              "type": "string"
+            },
+            {
+              "id": "a258e27a-7dcb-4bf0-ade8-5c4219e2ff10",
+              "name": "email_status",
+              "value": "={{ $('Loop Over Items1').item.json.email_status }}",
+              "type": "string"
+            },
+            {
+              "id": "3d32e338-0f63-440c-9b16-9aef4d7b3ff4",
+              "name": "photo_url",
+              "value": "={{ $('Loop Over Items1').item.json.photo_url }}",
+              "type": "string"
+            },
+            {
+              "id": "250d39c8-cc22-42cc-a04c-d0b445036751",
+              "name": "twitter_url",
+              "value": "={{ $('Loop Over Items1').item.json.twitter_url }}",
+              "type": "string"
+            },
+            {
+              "id": "5e0e0c9a-5f55-4630-bb2a-ff2524745011",
+              "name": "github_url",
+              "value": "={{ $('Loop Over Items1').item.json.github_url }}",
+              "type": "string"
+            },
+            {
+              "id": "ca28d838-3f12-4d6d-9f8f-5edae286f8ea",
+              "name": "facebook_url",
+              "value": "={{ $('Loop Over Items1').item.json.facebook_url }}",
+              "type": "string"
+            },
+            {
+              "id": "e497cc26-549a-43f7-a86f-251bf804bee8",
+              "name": "headlne",
+              "value": "={{ $('Loop Over Items1').item.json.headline }}",
+              "type": "string"
+            },
+            {
+              "id": "8c7c77f5-5182-4194-8d3f-67947772c4ec",
+              "name": "email",
+              "value": "={{ $('Loop Over Items1').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "06b27220-8ed0-4dd2-ab79-aec1999da815",
+              "name": "country",
+              "value": "={{ $('Loop Over Items1').item.json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "aca317a1-ffe4-45b9-acf3-f74555b94f1d",
+              "name": "organization_name",
+              "value": "={{ $('Loop Over Items1').item.json.organization.name }}",
+              "type": "string"
+            },
+            {
+              "id": "ea8e58ff-c1f1-4b47-88c7-e46ef780f594",
+              "name": "organization_website",
+              "value": "={{ $('Loop Over Items1').item.json.organization.website_url }}",
+              "type": "string"
+            },
+            {
+              "id": "57e5a482-f6b1-4f15-85e7-021d3283ff9a",
+              "name": "seniority",
+              "value": "={{ $('Loop Over Items1').item.json.seniority }}",
+              "type": "string"
+            },
+            {
+              "id": "fba67498-f957-4037-9630-0ba685bb3463",
+              "name": "=peronsal_emails",
+              "value": "={{ $('Loop Over Items1').item.json.personal_emails.map(email => email) }}\n",
+              "type": "string"
+            },
+            {
+              "id": "16193e45-fb22-455d-9fa1-a4c4de79c0b8",
+              "name": "research_info",
+              "value": "={{ $('Get More info on Person').item.json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "7e2bb9ca-2eff-4f11-bbc7-543471b1e298",
+              "name": "emailicebreaker",
+              "value": "={{ $('IceBreaker Creation Agent').item.json.output.EmailIceBreaker }}",
+              "type": "string"
+            },
+            {
+              "id": "b46e07f6-5d19-46d5-ab82-26e7a04c51ce",
+              "name": "LinkedinIceBreaker",
+              "value": "={{ $('IceBreaker Creation Agent').item.json.output.LinkedinIceBreaker }}",
+              "type": "string"
+            },
+            {
+              "id": "8993c481-c23f-42ef-9742-22b23a258395",
+              "name": "Email_subject",
+              "value": "={{ $('Generate LN & Email Intro Msg').item.json.output.email.subject }}\n",
+              "type": "string"
+            },
+            {
+              "id": "3f340d58-7d3f-4bd9-8961-ca553e78e533",
+              "name": "Email_body",
+              "value": "={{ $('Generate LN & Email Intro Msg').item.json.output.email.body }}",
+              "type": "string"
+            },
+            {
+              "id": "3a537a52-2d68-42aa-996a-d2cab9412259",
+              "name": "linkedin_body",
+              "value": "={{ $('Generate LN & Email Intro Msg').item.json.output.linkedin.body }}",
+              "type": "string"
+            },
+            {
+              "id": "307ed1ea-d15c-4ccb-bc87-9c8d2ce573b6",
+              "name": "Linkedin_ProviderID",
+              "value": "={{ $json.provider_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2760,
+        480
+      ],
+      "id": "0a01ff46-8e64-4f2a-8810-58bab1a45047",
+      "name": "Set All Data"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create Spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Create Spreadsheet').item.json.sheets[0].properties.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "twitter_url",
+              "displayName": "twitter_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "github_url",
+              "displayName": "github_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "facebook_url",
+              "displayName": "facebook_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "headlne",
+              "displayName": "headlne",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "organization_name",
+              "displayName": "organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "organization_website",
+              "displayName": "organization_website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "seniority",
+              "displayName": "seniority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "peronsal_emails",
+              "displayName": "peronsal_emails",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "research_info",
+              "displayName": "research_info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "emailicebreaker",
+              "displayName": "emailicebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedinIceBreaker",
+              "displayName": "LinkedinIceBreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email_subject",
+              "displayName": "Email_subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email_body",
+              "displayName": "Email_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_body",
+              "displayName": "linkedin_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2920,
+        640
+      ],
+      "id": "d1699140-c306-4a46-97ee-6e874fde6fbb",
+      "name": "update Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2080caac-d3df-4d0f-b6a2-e61b0c07decf",
+              "name": "user_query",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1220,
+        540
+      ],
+      "id": "dcaaa6fb-5a79-4a3c-a730-000311350582",
+      "name": "Set User Query"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        380
+      ],
+      "id": "70ab8892-e6e4-47ae-8b7e-32d61a24b613",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $('When chat message received').item.json.chatInput }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Sheet1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -660,
+        540
+      ],
+      "id": "93702e23-cbe7-4f4b-b191-df8bb139b90c",
+      "name": "Create Spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eznT0ZRowkdXvjYU",
+          "mode": "list",
+          "cachedResultName": "My workflow 8"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Spreadsheet Id": "={{ $('Create Spreadsheet').item.json.spreadsheetId }}",
+            "Sheetid": "={{ $('Create Spreadsheet').item.json.sheets[0].properties.sheetId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Spreadsheet Id",
+              "displayName": "Spreadsheet Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Sheetid",
+              "displayName": "Sheetid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1700,
+        200
+      ],
+      "id": "4ece0fda-d4c3-457c-9c08-6210bdbe600e",
+      "name": "Execute LN invite Workflow"
+    },
+    {
+      "parameters": {
+        "model": "=gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -1020,
+        760
+      ],
+      "id": "fbad7e64-c78f-4e40-b296-f1514087ef46",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIxeaCNdUBfgw6fq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.RandomNumber }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2420,
+        420
+      ],
+      "id": "1a779b33-56fe-41c4-a690-97a2f9f4e15c",
+      "name": "Wait5",
+      "webhookId": "2e2d10c8-1e03-4946-8900-c84f9e70d21a"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Spreadsheet Id"
+            },
+            {
+              "name": "Sheetid"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -260,
+        1220
+      ],
+      "id": "0d57bc8e-d626-42e7-b16c-25d42a9f210b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        180,
+        1200
+      ],
+      "id": "f9afa600-9d65-4ab6-824f-3b3518672634",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json['Spreadsheet id'] }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.Sheetid }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -40,
+        1220
+      ],
+      "id": "b19e0ded-dd89-4fa0-b2c6-f2f8305f1975",
+      "name": "Get Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "626f7a90-55f9-4756-b439-1bd81b894bff",
+              "name": "linkedin_url",
+              "value": "={{ $json.linkedin_url }}",
+              "type": "string"
+            },
+            {
+              "id": "39415988-966d-4e8d-a510-ce1a2b5d5c27",
+              "name": "linkedin_IceBreaker",
+              "value": "={{ $json.LinkedinIceBreaker }}",
+              "type": "string"
+            },
+            {
+              "id": "c4793f6f-247b-4d3d-8efc-554e67911e56",
+              "name": "user_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "7b19156b-7aab-4c7d-9100-6ca2fa3545bb",
+              "name": "EmailIceBreaker",
+              "value": "={{ $json.emailicebreaker }}",
+              "type": "string"
+            },
+            {
+              "id": "c256c160-fee1-4d67-a137-899f02b696b4",
+              "name": "EmailBody",
+              "value": "={{ $json.Email_body }}",
+              "type": "string"
+            },
+            {
+              "id": "9d4b969d-b6fb-4199-a0a2-33834cad55d2",
+              "name": "EmailSubject",
+              "value": "={{ $json.Email_subject }}",
+              "type": "string"
+            },
+            {
+              "id": "a466f546-551d-43c6-bbe4-fe59d465378b",
+              "name": "providerId",
+              "value": "={{ $json.Linkedin_ProviderID }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        1220
+      ],
+      "id": "28a2f5b5-63b5-4f54-8f6d-199570c81b83",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": " https://[subdomain].unipile.com:[port]/api/v1/users/invite",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "your_unipile_api_key"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.providerId }}"
+            },
+            {
+              "name": "account_id",
+              "value": "your_unipile_account_id"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Edit Fields1').item.json.linkedin_IceBreaker }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        1220
+      ],
+      "id": "9346d533-b959-40ce-93dc-2ae17f63ffcc",
+      "name": "SendInvite"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').item.json[\"Spreadsheet id\"] }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').item.json.Sheetid }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get Data').item.json.id }}",
+            "Linkedin_sentInvite": "={{$now}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "twitter_url",
+              "displayName": "twitter_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "github_url",
+              "displayName": "github_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "facebook_url",
+              "displayName": "facebook_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "headlne",
+              "displayName": "headlne",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "organization_name",
+              "displayName": "organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "organization_website",
+              "displayName": "organization_website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "seniority",
+              "displayName": "seniority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "peronsal_emails",
+              "displayName": "peronsal_emails",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "research_info",
+              "displayName": "research_info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emailicebreaker",
+              "displayName": "emailicebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedinIceBreaker",
+              "displayName": "LinkedinIceBreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email_subject",
+              "displayName": "Email_subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email_body",
+              "displayName": "Email_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_body",
+              "displayName": "linkedin_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin_sentInvite",
+              "displayName": "Linkedin_sentInvite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        920,
+        1220
+      ],
+      "id": "ad5018ff-2235-44b3-8002-ca4939138f3b",
+      "name": "UpdateINVSent",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_name": "={{ $('Loop Over Items').item.json.first_name }}",
+            "last_name": "={{ $('Loop Over Items').item.json.last_name }}",
+            "Name": "={{ $('Loop Over Items').item.json.name }}",
+            "LN_url": "={{ $('Loop Over Items').item.json.linkedin_url }}",
+            "LN_publicID": "={{$('Loop Over Items').item.json.linkedin_url.split('/in/')[1].replace('/', '')}}",
+            "LN_providerID": "={{ $('Loop Over Items').item.json.Linkedin_ProviderID }}",
+            "LN_invitationSent": "YES",
+            "LN_invitationaccepted": "NO",
+            "LN_msgSent": "NO",
+            "emailSent": "NO",
+            "LN_emailReplied": "NO",
+            "OriginSpreadsheetID": "={{ $('When Executed by Another Workflow').item.json['Spreadsheet id'] }}",
+            "Origin SheetID": "={{ $('When Executed by Another Workflow').item.json.Sheetid }}",
+            "LN_noofmessages": "0",
+            "Email": "={{ $('Loop Over Items').item.json.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_url",
+              "displayName": "LN_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_publicID",
+              "displayName": "LN_publicID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_providerID",
+              "displayName": "LN_providerID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_invitationSent",
+              "displayName": "LN_invitationSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_invitationaccepted",
+              "displayName": "LN_invitationaccepted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_msgSent",
+              "displayName": "LN_msgSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emailSent",
+              "displayName": "emailSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_emailReplied",
+              "displayName": "LN_emailReplied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OriginSpreadsheetID",
+              "displayName": "OriginSpreadsheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Origin SheetID",
+              "displayName": "Origin SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LN_noofmessages",
+              "displayName": "LN_noofmessages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1140,
+        1220
+      ],
+      "id": "0631ce7f-b00a-4651-8c7c-aec1e22aab62",
+      "name": "UpdateLNInfoSheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories2",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.LN_providerID }}",
+            "messages": "={ \"type\": \"ai\", \"content\": \"{{ $('Edit Fields1').item.json.linkedin_IceBreaker }}\", \"tool_calls\": [], \"additional_kwargs\": {}, \"response_metadata\": {}, invalid_tool_calls\": [] }"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1360,
+        1220
+      ],
+      "id": "1a4edded-18e4-48b2-894a-22415ff41c1f",
+      "name": "save LinkedinInvite history",
+      "credentials": {
+        "postgres": {
+          "id": "d1JSOaMczxF9zHK4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('UpdateLNInfoSheet').item.json.Email }}",
+        "subject": "={{ $('Edit Fields1').item.json.EmailSubject }}",
+        "emailType": "text",
+        "message": "={{ $('Edit Fields1').item.json.EmailBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        1220
+      ],
+      "id": "3571a184-3884-4e5f-b462-3e878902fa22",
+      "name": "Sent Mail",
+      "webhookId": "bc0afde8-c0ad-4ada-a911-fbd337e10260",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aWIiUJWmv2DE2hdS",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories_email",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories_email"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Session_id": "={{ $('UpdateLNInfoSheet').item.json.Email }}",
+            "message": "={ \"type\": \"ai\", \"content\": \"{{ $('Edit Fields1').item.json.EmailBody.replace(/\\n/g,'') }}\", \"tool_calls\": [], \"additional_kwargs\": {}, \"response_metadata\": {}, invalid_tool_calls\": [] }"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Session_id",
+              "displayName": "Session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1760,
+        1220
+      ],
+      "id": "08e73310-05e2-4134-9f10-3c966b1d2327",
+      "name": "Save Mail Sent History",
+      "credentials": {
+        "postgres": {
+          "id": "d1JSOaMczxF9zHK4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.RandomNumber }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        1220
+      ],
+      "id": "ef8b5b53-8a37-4fd3-ad8f-72b903617518",
+      "name": "Wait2",
+      "webhookId": "2e2d10c8-1e03-4946-8900-c84f9e70d21a"
+    },
+    {
+      "parameters": {
+        "jsCode": "items[0].json.RandomNumber = Math.floor(Math.random() * 8);\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        1220
+      ],
+      "id": "8524f392-dd82-4e71-8c0d-3163a56b8647",
+      "name": "randomizer1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LN_providerID": "={{ $json.LN_providerID }}",
+            "LN_invitationaccepted": "YES"
+          },
+          "matchingColumns": [
+            "LN_providerID"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_url",
+              "displayName": "LN_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_publicID",
+              "displayName": "LN_publicID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_providerID",
+              "displayName": "LN_providerID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LN_invitationSent",
+              "displayName": "LN_invitationSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_invitationaccepted",
+              "displayName": "LN_invitationaccepted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LN_msgSent",
+              "displayName": "LN_msgSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailSent",
+              "displayName": "emailSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_emailReplied",
+              "displayName": "LN_emailReplied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "OriginSpreadsheetID",
+              "displayName": "OriginSpreadsheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Origin SheetID",
+              "displayName": "Origin SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_noofmessages",
+              "displayName": "LN_noofmessages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        540,
+        1700
+      ],
+      "id": "28533b3b-70d0-43cf-864c-b52ac61aa7d6",
+      "name": "update LN tracker",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get the Person1').item.json.OriginSpreadsheetID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Get the Person1').item.json[\"Origin SheetID\"] }}",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Linkedin_ProviderID",
+              "lookupValue": "={{ $json.LN_providerID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1160,
+        1700
+      ],
+      "id": "a170fe87-c031-4484-a884-b9c34034def2",
+      "name": "Get LN body",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('When First Msg Recieved').item.json.body.attendees[0].attendee_provider_id }}",
+            "messages": "={ \"type\": \"ai\", \"content\": \"{{ $('Get LN body').item.json.linkedin_body.replace(/\\n/g,'') }}\", \"tool_calls\": [], \"additional_kwargs\": {}, \"response_metadata\": {}, invalid_tool_calls\": [] }"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1580,
+        1700
+      ],
+      "id": "f754f51b-b74f-4853-862a-35f0c4467646",
+      "name": "add first msg to memory",
+      "credentials": {
+        "postgres": {
+          "id": "d1JSOaMczxF9zHK4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LN_providerID": "={{ $('When First Msg Recieved').item.json.body.attendees[0].attendee_provider_id }}",
+            "LN_noofmessages": "1"
+          },
+          "matchingColumns": [
+            "LN_providerID"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_url",
+              "displayName": "LN_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_publicID",
+              "displayName": "LN_publicID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_providerID",
+              "displayName": "LN_providerID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LN_invitationSent",
+              "displayName": "LN_invitationSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_invitationaccepted",
+              "displayName": "LN_invitationaccepted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_msgSent",
+              "displayName": "LN_msgSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailSent",
+              "displayName": "emailSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_emailReplied",
+              "displayName": "LN_emailReplied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "OriginSpreadsheetID",
+              "displayName": "OriginSpreadsheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Origin SheetID",
+              "displayName": "Origin SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_noofmessages",
+              "displayName": "LN_noofmessages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1780,
+        1700
+      ],
+      "id": "524346af-bf2a-422c-a5c5-a03e62cb0716",
+      "name": "Update Message Number in GSheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deeba7a0-65c1-4c5b-ae32-6a2ff9a006e2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        1700
+      ],
+      "id": "96b63f6f-f569-4878-bcc0-5b918ecf7a52",
+      "name": "When First Msg Recieved",
+      "webhookId": "deeba7a0-65c1-4c5b-ae32-6a2ff9a006e2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8b46b7be-162d-4f3c-9a99-0daeb1286fc2",
+              "leftValue": "={{ $json.LN_noofmessages }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        1700
+      ],
+      "id": "6e2fb076-bfdb-49a0-9e4f-ae313896255d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "LN_providerID",
+              "lookupValue": "={{ $json.body.attendees[0].attendee_provider_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        20,
+        1700
+      ],
+      "id": "87c43934-aad6-41d9-969c-39f326b48094",
+      "name": "Get the Person1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://[subdomain].unipile.com:[port]/api/v1/chats",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "your_unipile_api_key"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "attendees_ids",
+              "value": "={{ $json.Linkedin_ProviderID }}"
+            },
+            {
+              "name": "account_id",
+              "value": "your_unipile_account_id"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.linkedin_body }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        1700
+      ],
+      "id": "4c4eb02f-d8ca-4b2f-9c27-617453cb8e6f",
+      "name": "SendMessage1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.RandomNumber }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        1700
+      ],
+      "id": "13b6e596-5075-42e5-8bad-aef56bcd89f4",
+      "name": "Wait3",
+      "webhookId": "2e2d10c8-1e03-4946-8900-c84f9e70d21a"
+    },
+    {
+      "parameters": {
+        "jsCode": "items[0].json.RandomNumber = Math.floor(Math.random() * 8);\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        1700
+      ],
+      "id": "6b25edf8-09f6-428c-821e-0380d6c5f96e",
+      "name": "randomizer2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "LN_providerID",
+              "lookupValue": "={{ $json.body.attendees[0].attendee_provider_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        60,
+        2160
+      ],
+      "id": "69c67679-e989-4f58-b244-4878963332fe",
+      "name": "Get the Person",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b4189cc2-87aa-4a03-8ee3-469678a68d36",
+              "leftValue": "={{ $json.LN_noofmessages }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "5c48903c-c850-4f16-a1f7-408c7f5ac343",
+              "leftValue": "={{ $('Msg Recieved').item.json.body.sender.attendee_provider_id }}",
+              "rightValue": "={{ $('Msg Recieved').item.json.body.attendees[0].attendee_provider_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        2160
+      ],
+      "id": "e79e4f18-b77b-4de5-ab22-35ead94d40d2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deeba7a0-65c1-4c5b-ae32-6a2ff9a006e2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        2160
+      ],
+      "id": "bdd91edd-360b-403e-970d-113bf9b4a4cb",
+      "name": "Msg Recieved",
+      "webhookId": "deeba7a0-65c1-4c5b-ae32-6a2ff9a006e2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get the Person').item.json.OriginSpreadsheetID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Get the Person').item.json[\"Origin SheetID\"] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        460,
+        2140
+      ],
+      "id": "b67dedc3-ee98-4779-ae66-2edb4f9665c2",
+      "name": "Get Data from Main Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Message from the attendee: {{ $('Msg Recieved').item.json.body.message }}",
+        "options": {
+          "systemMessage": "=\nYou are a professional LinkedIn outreach assistant. Your goal is to respond to recipients who have replied to your initial message, engage in a meaningful\nconversation to understand their situation, and encourage them to book a call using a provided calendar link. Follow these guidelines:\n1. **Acknowledge Their Reply**: Start by thanking them for responding and referencing something specific from their message.\n2. **Ask Open-Ended Questions**: Show genuine interest in their situation by asking thoughtful questions to learn more about their goals, challenges, or interests.\n3. **Provide Value**: Highlight how a call could benefit them based on what they've shared.\n4. **Suggest a Call**: Transition naturally to suggesting a call and share the calendar link in a polite, non-pushy way.\n5. **Be Professional and Friendly**: Maintain a polite, respectful, and conversational tone throughout.\n**Example Workflow:**\n1. **Acknowledge and Engage**:\n*\"Hi [Name], thanks for getting back to me! It's great to hear about [specific detail from their reply]. Could you tell me more about [specific topic]?\"*\n2. **Ask Follow-Up Questions**:\n*\"That's really interesting! How are you currently approaching [specific challenge or goal] ?\"*\n3. **Transition to a Call**:\n*\"It sounds like [specific insight]. I'd love to explore this further and see how I can help. Would you be open to a quick 15-minute call? Here's my calendar link: kyleautomates. Feel free to pick a time that\nworks best for you!\"*\n4. **Handle Objections or Questions**:\nIf they hesitate or ask for more details, respond politely and provide clarity. *\"I completely understand! On the call, we can discuss [specific benefit or topic]. Let me know if that works for you!\"*\n5. **Follow Up If Needed**:\nIf they don't book a call, send a polite follow-up after a few days:\n*\"Hi [Name], just checking in to see if you'd like to connect. Let me know if you'd like to schedule a quick chat. Here's my calendar link again: [Insert Link]. Looking forward to hearing from you.\n\nFocus on building rapport, understanding their needs, and making it easy for them to book a call.\nThis prompt ensures the agent responds thoughtfully and transitions naturally to booking a call.\nAdditional Info:\nAttendies name: {{ $('Msg Recieved').item.json.body.attendees[0].attendee_name }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        640,
+        2140
+      ],
+      "id": "2bc62eea-cd36-4303-8d92-c3d419c90865",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        2380
+      ],
+      "id": "7d57e269-c4e5-4c1b-bcfd-21dbb2e3aa78",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIxeaCNdUBfgw6fq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Msg Recieved').item.json.body.attendees[0].attendee_provider_id }}",
+        "tableName": "=n8n_chat_histories"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        760,
+        2380
+      ],
+      "id": "6eebe0b6-3cbd-45a2-a269-a1a69e8cb15d",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "d1JSOaMczxF9zHK4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://[subdomain].unipile.com:[port]/api/v1/chats",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "your_unipile_api_key"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "attendees_ids",
+              "value": "={{ $('Msg Recieved').item.json.body.attendees[0].attendee_provider_id }}"
+            },
+            {
+              "name": "account_id",
+              "value": "your_unipile_account_id"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('AI Agent').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        2140
+      ],
+      "id": "1076929b-f7e5-45e4-bb60-9b3a5f835a90",
+      "name": "SendMessage"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ",
+          "mode": "list",
+          "cachedResultName": "LN Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tSl-WdN2D6BPtWbE0Yu2WWY4tjfr6likzBHgoNJAnRQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LN_providerID": "={{ $('Get the Person').item.json.LN_providerID }}",
+            "LN_noofmessages": "={{ $json.updatedmessages }}"
+          },
+          "matchingColumns": [
+            "LN_providerID"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_url",
+              "displayName": "LN_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_publicID",
+              "displayName": "LN_publicID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_providerID",
+              "displayName": "LN_providerID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LN_invitationSent",
+              "displayName": "LN_invitationSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_invitationaccepted",
+              "displayName": "LN_invitationaccepted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_msgSent",
+              "displayName": "LN_msgSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailSent",
+              "displayName": "emailSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_emailReplied",
+              "displayName": "LN_emailReplied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "OriginSpreadsheetID",
+              "displayName": "OriginSpreadsheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Origin SheetID",
+              "displayName": "Origin SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LN_noofmessages",
+              "displayName": "LN_noofmessages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1720,
+        2140
+      ],
+      "id": "bfbba813-4aaa-4650-9400-8fe1336ca187",
+      "name": "Update the number of messages",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTt9naIGXD9ZzY8I",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let currentmessages = $('Get the Person').first().json.LN_noofmessages\n\ncurrentmessages = currentmessages ? Number(currentmessages) : 0;\n\nlet updatedmessages = currentmessages + 1;\n\nreturn [\n  {\n    updatedmessages : updatedmessages\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        2140
+      ],
+      "id": "ede0c133-fe8b-4f06-a813-0e39a728d35b",
+      "name": "code"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.RandomNumber }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1180,
+        2140
+      ],
+      "id": "9eea5ffb-87fb-4a49-99c1-d62eea77f954",
+      "name": "Wait1",
+      "webhookId": "2e2d10c8-1e03-4946-8900-c84f9e70d21a"
+    },
+    {
+      "parameters": {
+        "jsCode": "items[0].json.RandomNumber = Math.floor(Math.random() * 8);\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        2140
+      ],
+      "id": "eea1776b-d1c8-48ce-b924-facd4964d145",
+      "name": "randomizer3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Set User Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "Get More info on Person",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Get More info on Person",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "IceBreaker Creation Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "IceBreaker Creation Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate LN & Email Intro Msg",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate LN & Email Intro Msg",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "randomizer": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get More info on Person": {
+      "main": [
+        [
+          {
+            "node": "IceBreaker Creation Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IceBreaker Creation Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate LN & Email Intro Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate LN & Email Intro Msg": {
+      "main": [
+        [
+          {
+            "node": "randomizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getProviderID": {
+      "main": [
+        [
+          {
+            "node": "Set All Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo  Url Agent": {
+      "main": [
+        [
+          {
+            "node": "Create Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo Apify": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set All Data": {
+      "main": [
+        [
+          {
+            "node": "update Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set User Query": {
+      "main": [
+        [
+          {
+            "node": "Apollo  Url Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Execute LN invite Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get More info on Person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Apollo Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Apollo  Url Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "getProviderID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "SendInvite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInvite": {
+      "main": [
+        [
+          {
+            "node": "UpdateINVSent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdateINVSent": {
+      "main": [
+        [
+          {
+            "node": "UpdateLNInfoSheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdateLNInfoSheet": {
+      "main": [
+        [
+          {
+            "node": "save LinkedinInvite history",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save LinkedinInvite history": {
+      "main": [
+        [
+          {
+            "node": "Sent Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sent Mail": {
+      "main": [
+        [
+          {
+            "node": "Save Mail Sent History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Mail Sent History": {
+      "main": [
+        [
+          {
+            "node": "randomizer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "randomizer1": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update LN tracker": {
+      "main": [
+        [
+          {
+            "node": "randomizer2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get LN body": {
+      "main": [
+        [
+          {
+            "node": "SendMessage1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add first msg to memory": {
+      "main": [
+        [
+          {
+            "node": "Update Message Number in GSheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When First Msg Recieved": {
+      "main": [
+        [
+          {
+            "node": "Get the Person1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "update LN tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Person1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendMessage1": {
+      "main": [
+        [
+          {
+            "node": "add first msg to memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Get LN body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "randomizer2": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Person": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Data from Main Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Msg Recieved": {
+      "main": [
+        [
+          {
+            "node": "Get the Person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data from Main Sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "randomizer3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendMessage": {
+      "main": [
+        [
+          {
+            "node": "code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code": {
+      "main": [
+        [
+          {
+            "node": "Update the number of messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "SendMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "randomizer3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b2da604c-29bd-4951-a2d8-b872cbf85688",
+  "meta": {
+    "instanceId": "65af305d1c7aa0a9e756a359afc73e6e11d7f8cbed1e9987ff8cc33f37533584"
+  },
+  "id": "YGfWUEEpoF9ldg2P",
+  "tags": []
+}
